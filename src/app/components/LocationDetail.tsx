@@ -104,23 +104,15 @@ export function LocationDetail({ location, onClose, onVisit, onViewPanorama }: L
             </div>
           )}
 
-          <div className="grid grid-cols-2 gap-3">
+          {onViewPanorama && (
             <button
-              className="border-2 border-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
+              onClick={() => onViewPanorama(location)}
+              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg hover:shadow-lg transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-2"
             >
-              <Navigation className="w-5 h-5" />
-              Directions
+              <Camera className="w-5 h-5" />
+              360° View
             </button>
-            {onViewPanorama && (
-              <button
-                onClick={() => onViewPanorama(location)}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg hover:shadow-lg transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-2"
-              >
-                <Camera className="w-5 h-5" />
-                360° View
-              </button>
-            )}
-          </div>
+          )}
         </div>
       </div>
     </div>
