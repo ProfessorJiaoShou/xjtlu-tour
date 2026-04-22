@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
-import { X, Navigation, ImageOff, RefreshCw, ZoomIn, ZoomOut, RotateCw } from 'lucide-react';
+import { X, Navigation, ImageOff, RefreshCw, ZoomIn, ZoomOut, RotateCw, Smartphone } from 'lucide-react';
+import { Viewer } from 'photo-sphere-viewer';
+import 'photo-sphere-viewer/dist/photo-sphere-viewer.css';
 
 interface PanoramaViewerProps {
   panoramaUrl: string;
@@ -8,14 +10,12 @@ interface PanoramaViewerProps {
 }
 
 export function PanoramaViewer({ panoramaUrl, locationName, onClose }: PanoramaViewerProps) {
-  const imageRef = useRef<HTMLImageElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const viewerRef = useRef<Viewer | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [scale, setScale] = useState(1);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [gyroEnabled, setGyroEnabled] = useState(false);
+  const [showGyroButton, setShowGyroButton] = useState(true);
 
   useEffect(() => {
     if (!panoramaUrl) {
@@ -24,53 +24,109 @@ export function PanoramaViewer({ panoramaUrl, locationName, onClose }: PanoramaV
       return;
     }
 
+    // 验证图片URL是否有效
     const img = new Image();
     img.onload = () => {
-      console.log('Panorama image loaded successfully');
-      setLoading(false);
-      setError(null);
+      // 图片加载成功，初始化查看器
+      initializeViewer();
     };
     img.onerror = () => {
-      console.error('Failed to load panorama image');
+      setError('Failed to load panorama image. Please check the image path and format.');
       setLoading(false);
-      setError('Failed to load panorama image. Please check the image path.');
     };
     img.src = panoramaUrl;
-  }, [panoramaUrl]);
 
-  const handleMouseDown = (e: React.MouseEvent) => {
-    setIsDragging(true);
-    setDragStart({ x: e.clientX - position.x, y: e.clientY - position.y });
-  };
+    const initializeViewer = () => {
+      if (!containerRef.current) return;
 
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging) return;
-    const newX = e.clientX - dragStart.x;
-    const newY = e.clientY - dragStart.y;
-    setPosition({ x: newX, y: newY });
-  };
+      try {
+        const viewer = new Viewer({
+          container: containerRef.current,
+          panorama: panoramaUrl,
+          caption: locationName,
+          defaultZoomLvl: 0,
+          mousewheel: true,
+          navbar: [
+            'zoom',
+            'move',
+            'fullscreen'
+          ]
+        });
 
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
+        viewerRef.current = viewer;
 
-  const handleWheel = (e: React.WheelEvent) => {
-    e.preventDefault();
-    const delta = e.deltaY > 0 ? -0.1 : 0.1;
-    setScale(prev => Math.max(0.5, Math.min(3, prev + delta)));
+        viewer.on('ready', () => {
+          console.log('Panorama viewer ready');
+          setLoading(false);
+          setError(null);
+        });
+
+        viewer.on('error', (e: any) => {
+          console.error('Panorama viewer error:', e);
+          setLoading(false);
+          setError('Failed to initialize panorama viewer. The image format may not be supported.');
+        });
+
+        return () => {
+          if (viewerRef.current) {
+            viewerRef.current.destroy();
+            viewerRef.current = null;
+          }
+        };
+      } catch (err) {
+        console.error('Failed to initialize panorama viewer:', err);
+        setLoading(false);
+        setError('Failed to initialize panorama viewer. Please try again.');
+      }
+    };
+  }, [panoramaUrl, locationName]);
+
+  const toggleGyroscope = async () => {
+    if (!viewerRef.current) return;
+
+    if (gyroEnabled) {
+      try {
+        viewerRef.current.stopGyroscopeControl();
+        setGyroEnabled(false);
+      } catch (err) {
+        console.error('Failed to disable gyroscope:', err);
+      }
+    } else {
+      try {
+        await viewerRef.current.startGyroscopeControl();
+        setGyroEnabled(true);
+      } catch (err) {
+        console.error('Failed to enable gyroscope:', err);
+        setError('Unable to enable gyroscope. Please ensure your device supports it and permission is granted.');
+      }
+    }
   };
 
   const handleZoomIn = () => {
-    setScale(prev => Math.min(3, prev + 0.2));
+    if (viewerRef.current) {
+      viewerRef.current.zoom(viewerRef.current.getZoomLevel() + 5);
+    }
   };
 
   const handleZoomOut = () => {
-    setScale(prev => Math.max(0.5, prev - 0.2));
+    if (viewerRef.current) {
+      viewerRef.current.zoom(viewerRef.current.getZoomLevel() - 5);
+    }
   };
 
   const handleReset = () => {
-    setPosition({ x: 0, y: 0 });
-    setScale(1);
+    if (viewerRef.current) {
+      viewerRef.current.zoom(0);
+      viewerRef.current.rotate({ yaw: 0, pitch: 0 });
+    }
+  };
+
+  const getZoomPercentage = () => {
+    if (viewerRef.current) {
+      const zoom = viewerRef.current.getZoomLevel();
+      return Math.max(0, Math.min(100, Math.round(zoom)));
+    }
+    return 0;
   };
 
   return (
@@ -92,6 +148,15 @@ export function PanoramaViewer({ panoramaUrl, locationName, onClose }: PanoramaV
 
       <div className="absolute bottom-4 left-4 right-4 z-10 flex items-center justify-between">
         <div className="bg-black/50 backdrop-blur-sm rounded-lg px-4 py-2 text-white flex items-center gap-3">
+          {showGyroButton && (
+            <button
+              onClick={toggleGyroscope}
+              className={`hover:bg-white/20 rounded-full p-2 transition-colors ${gyroEnabled ? 'bg-green-500/50' : ''}`}
+              title={gyroEnabled ? 'Disable Gyroscope' : 'Enable Gyroscope'}
+            >
+              <Smartphone className={`w-5 h-5 ${gyroEnabled ? 'text-green-300' : ''}`} />
+            </button>
+          )}
           <button
             onClick={handleZoomOut}
             className="hover:bg-white/20 rounded-full p-2 transition-colors"
@@ -99,7 +164,7 @@ export function PanoramaViewer({ panoramaUrl, locationName, onClose }: PanoramaV
           >
             <ZoomOut className="w-5 h-5" />
           </button>
-          <span className="text-sm min-w-[3rem] text-center">{Math.round(scale * 100)}%</span>
+          <span className="text-sm min-w-[3rem] text-center">{getZoomPercentage()}%</span>
           <button
             onClick={handleZoomIn}
             className="hover:bg-white/20 rounded-full p-2 transition-colors"
@@ -117,7 +182,7 @@ export function PanoramaViewer({ panoramaUrl, locationName, onClose }: PanoramaV
           </button>
         </div>
         <div className="bg-black/50 backdrop-blur-sm rounded-lg px-3 py-2 text-white text-xs">
-          Drag to move · Scroll to zoom
+          Drag to rotate · Scroll to zoom · Gyroscope for mobile
         </div>
       </div>
 
@@ -148,34 +213,8 @@ export function PanoramaViewer({ panoramaUrl, locationName, onClose }: PanoramaV
 
       <div 
         ref={containerRef}
-        className="flex-1 w-full h-full overflow-hidden cursor-move"
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
-        onWheel={handleWheel}
-      >
-        <div 
-          className="absolute inset-0 flex items-center justify-center"
-          style={{
-            transform: `translate(${position.x}px, ${position.y}px) scale(${scale})`,
-            transition: isDragging ? 'none' : 'transform 0.1s ease-out'
-          }}
-        >
-          <img
-            ref={imageRef}
-            src={panoramaUrl}
-            alt="360° Panorama"
-            className="max-w-none max-h-none"
-            style={{
-              maxHeight: '100%',
-              maxWidth: '100%',
-              objectFit: 'contain'
-            }}
-            draggable={false}
-          />
-        </div>
-      </div>
+        className="flex-1 w-full h-full"
+      />
     </div>
   );
 }

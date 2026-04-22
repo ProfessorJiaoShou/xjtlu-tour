@@ -1,7 +1,5 @@
 import { useState } from 'react';
 import { MapView } from './components/MapView';
-import { LocationsList } from './components/LocationsList';
-import { NavigationBar } from './components/NavigationBar';
 import { WelcomeScreen } from './components/WelcomeScreen';
 import { LocationDetail } from './components/LocationDetail';
 import { TourProgress } from './components/TourProgress';
@@ -22,7 +20,7 @@ export type Location = {
 };
 
 export default function App() {
-  const [currentView, setCurrentView] = useState<'welcome' | 'map' | 'list'>('welcome');
+  const [showWelcome, setShowWelcome] = useState(true);
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
   const [panoramaLocation, setPanoramaLocation] = useState<Location | null>(null);
   const [totalPoints, setTotalPoints] = useState(0);
@@ -198,8 +196,8 @@ export default function App() {
   const visitedCount = locations.filter(loc => loc.visited).length;
   const totalLocations = locations.length;
 
-  if (currentView === 'welcome') {
-    return <WelcomeScreen onStart={() => setCurrentView('map')} />;
+  if (showWelcome) {
+    return <WelcomeScreen onStart={() => setShowWelcome(false)} />;
   }
 
   return (
@@ -211,25 +209,11 @@ export default function App() {
       />
 
       <div className="flex-1 overflow-hidden">
-        {currentView === 'map' && (
-          <MapView
-            locations={locations}
-            onLocationSelect={handleLocationSelect}
-          />
-        )}
-
-        {currentView === 'list' && (
-          <LocationsList
-            locations={locations}
-            onLocationSelect={handleLocationSelect}
-          />
-        )}
+        <MapView
+          locations={locations}
+          onLocationSelect={handleLocationSelect}
+        />
       </div>
-
-      <NavigationBar
-        currentView={currentView}
-        onViewChange={setCurrentView}
-      />
 
       {selectedLocation && (
         <LocationDetail
