@@ -1,44 +1,58 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Location } from '../App';
 import { Navigation, Info, ZoomIn, ZoomOut, RotateCcw, ChevronDown, ChevronUp } from 'lucide-react';
 import campusMapImage from '../../imports/xjtlu.png';
 
 interface MapViewProps {
-  locations: Location[];
-  onLocationSelect: (location: Location) => void;
+  locations: Location[];// 位置数据列表
+  onLocationSelect: (location: Location) => void;// 选择位置回调函数
+};//地图属性接口
+
+// 📍 SVG按钮位置配置 - 使用SVG坐标系统
+// 坐标范围: x: 0-1000, y: 0-1000 (SVG视口坐标系)
+const buttonPositions: Record<string, { x: number; y: number; size: number }> = {
+  '1': { x: 420, y: 555, size: 20 },   // 中心大楼 (CB)
+  '2': { x: 550, y: 450, size: 20 },   // 西安交通大学研究院 (XJRI)
+  '3': { x: 410, y: 460, size: 20 },   // 基础教学楼 (FB)
+  '4': { x: 720, y: 750, size: 20 },   // 南校区运动场
+  '5': { x: 570, y: 790, size: 20 },   // 南校区湖泊
+  '6': { x: 630, y: 550, size: 15 },   // 食堂
+  '7': { x: 700, y: 580, size: 20 },   // 工程大楼 (EB)
+  '8': { x: 520, y: 710, size: 20 },   // 商学院 (BS)
+  '9': { x: 599, y: 250, size: 20 },   // 生活区 (LA)  
+  '10': { x: 300, y: 300, size: 20 },  // 生命科学大楼 (LS)
+  '11': { x: 700, y: 500, size: 20 },  // 数学大楼 (MA)
+  '12': { x: 580, y: 900, size: 20 },  // 环境科学大楼 (ES)
 };
 
-// 📍 Button position configuration - Modify each button's position and size here
-// Coordinate range: left: 0-100%, top: 0-100%
-// Size range: size: 0.5-3.0 (1.0 is default size)
-const buttonPositions: Record<string, { left: number; top: number; size: number }> = {
-  '1': { left: 42, top: 55.5, size: 0.5 },   // Central Building (CB)
-  '2': { left: 55, top: 45, size: 0.5},   // Xi'an Jiaotong-university research institute (XJRI)
-  '3': { left: 41, top: 46, size: 0.5 },   // Foundation Building (FB)
-  '4': { left: 72, top: 68, size: 0.5 },   // South Campus Sports Field
-  '5': { left: 57, top: 70, size: 0.5 },   // South Campus Lake
-  '6': { left: 63, top: 55, size: 0.3 },   // Dining Hall
-  '7': { left: 70, top: 58, size: 0.5 },   // Engineering Building (EB)
-  '8': { left: 52, top: 71, size: 0.5 },   // Business School (BS)
-  '9': { left: 45, top: 25, size: 0.5 },   // Living Area (LA)  
-  '10': { left: 30, top: 36, size: 0.5 },  // Life Sciences Building (LS)
-  '11': { left: 70, top: 50, size: 0.5 },  // Mathematics Building (MA)
-  '12': { left: 58, top: 75, size: 0.5 },  // Environmental Science Building (ES)
-};
-
-export function MapView({ locations, onLocationSelect }: MapViewProps) {
-  const [scale, setScale] = useState(1);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-  const [showInfo, setShowInfo] = useState(true);
+export function MapView({ locations, onLocationSelect }: MapViewProps) {// 地图组件
+  const [scale, setScale] = useState(1);// 缩放比例
+  const [position, setPosition] = useState({ x: 0, y: 0 });// 地图位置
+  const [isDragging, setIsDragging] = useState(false);// 是否正在拖动
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });//拖拽开始位置
+  const [showInfo, setShowInfo] = useState(true);// 是否显示信息  
   
-  const handleWheel = (e: React.WheelEvent) => {
+  // 使用ref来引用SVG容器
+  const svgContainerRef = useRef<HTMLDivElement>(null);
+  
+  const handleWheel = (e: WheelEvent) => {
     e.preventDefault();
     const delta = e.deltaY > 0 ? -0.1 : 0.1;
-    const newScale = Math.max(0.5, Math.min(3, scale + delta));
+    const newScale = Math.max(0.3, Math.min(5, scale + delta));
     setScale(newScale);
   };
+  
+  // 使用useEffect添加事件监听器，避免被动事件监听器问题
+  useEffect(() => {
+    const container = svgContainerRef.current;
+    if (!container) return;
+    
+    container.addEventListener('wheel', handleWheel, { passive: false });
+    
+    return () => {
+      container.removeEventListener('wheel', handleWheel);
+    };
+  }, [scale]); // 依赖scale，确保使用最新的scale值
   
   const handleMouseDown = (e: React.MouseEvent) => {
     setIsDragging(true);
@@ -63,9 +77,10 @@ export function MapView({ locations, onLocationSelect }: MapViewProps) {
   
   return (
     <div className="h-full w-full relative bg-white overflow-hidden">
+      {/* 地图容器 - 使用图片背景和SVG按钮 */}
       <div 
+        ref={svgContainerRef}
         className="absolute inset-0 cursor-grab active:cursor-grabbing"
-        onWheel={handleWheel}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
@@ -76,79 +91,80 @@ export function MapView({ locations, onLocationSelect }: MapViewProps) {
           transition: isDragging ? 'none' : 'transform 0.2s ease-out'
         }}
       >
+        {/* 校园地图图片背景 */}
         <img
           src={campusMapImage}
           alt="XJTLU Campus Map"
           className="w-full h-full object-contain"
         />
         
-        <div className="absolute inset-0 p-4 pt-12 pb-4">
+        {/* SVG按钮层 - 在图片上方叠加SVG按钮 */}
+        <svg 
+          viewBox="0 0 1000 1000" 
+          className="absolute inset-0 w-full h-full pointer-events-none"
+          preserveAspectRatio="xMidYMid meet"
+        >
+          {/* 地点标记按钮 - 使用SVG确保按钮与地图同步缩放 */}
           {locations.map((location) => {
-            const buttonPos = buttonPositions[location.id] || { left: 50, top: 50, size: 1.0 };
-            const buttonSize = buttonPos.size || 1.0;
-            const baseSize = 48;
-            const scaledSize = baseSize * buttonSize;
-            const iconSize = Math.round(24 * buttonSize);
-            const pulseSize = Math.round(64 * buttonSize);
-            const checkSize = Math.round(24 * buttonSize);
-            const checkFontSize = Math.round(14 * buttonSize);
+            const buttonPos = buttonPositions[location.id] || { x: 500, y: 500, size: 20 };
+            const radius = buttonPos.size;
             
             return (
-              <button
-                key={location.id}
-                onClick={() => onLocationSelect(location)}
-                className="absolute cursor-pointer transition-all hover:scale-110 active:scale-95"
-                style={{
-                  left: `${buttonPos.left}%`,
-                  top: `${buttonPos.top}%`,
-                  transform: 'translate(-50%, -50%)',
-                  width: `${scaledSize}px`,
-                  height: `${scaledSize}px`
-                }}
-              >
+              <g key={location.id} onClick={() => onLocationSelect(location)} className="cursor-pointer pointer-events-auto">
+                {/* 已访问地点的脉冲动画效果 */}
                 {location.visited && (
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div 
-                      className="rounded-full bg-green-500/30 animate-pulse" 
-                      style={{
-                        width: `${pulseSize}px`,
-                        height: `${pulseSize}px`
-                      }}
-                    />
-                  </div>
+                  <circle 
+                    cx={buttonPos.x} 
+                    cy={buttonPos.y} 
+                    r={radius * 1.5} 
+                    fill="#22c55e" 
+                    fillOpacity="0.3"
+                    className="animate-pulse"
+                  />
                 )}
-                <div 
-                  className="relative rounded-full bg-blue-600 border-4 border-white shadow-lg flex items-center justify-center hover:bg-blue-700 transition-colors"
-                  style={{
-                    borderWidth: `${Math.round(4 * buttonSize)}px`
-                  }}
+                
+                {/* 主按钮圆形 */}
+                <circle 
+                  cx={buttonPos.x} 
+                  cy={buttonPos.y} 
+                  r={radius} 
+                  fill={location.visited ? "#22c55e" : "#3b82f6"} 
+                  stroke="white" 
+                  strokeWidth="3"
+                  className="hover:fill-opacity-80 transition-all"
+                />
+                
+                {/* 地点图标 */}
+                <text 
+                  x={buttonPos.x} 
+                  y={buttonPos.y + radius * 0.3} 
+                  textAnchor="middle" 
+                  fill="white" 
+                  fontSize={radius * 0.8}
+                  fontWeight="bold"
+                  pointerEvents="none"
                 >
-                  <span 
-                    style={{
-                      fontSize: `${iconSize}px`
-                    }}
-                  >
-                    {location.image}
-                  </span>
-                </div>
+                  {location.image}
+                </text>
+                
+                {/* 已访问标记（绿色对勾） */}
                 {location.visited && (
-                  <div 
-                    className="absolute bg-green-500 rounded-full flex items-center justify-center text-white font-bold shadow-md"
-                    style={{
-                      top: `-${Math.round(4 * buttonSize)}px`,
-                      right: `-${Math.round(4 * buttonSize)}px`,
-                      width: `${checkSize}px`,
-                      height: `${checkSize}px`,
-                      fontSize: `${checkFontSize}px`
-                    }}
+                  <text 
+                    x={buttonPos.x + radius * 0.6} 
+                    y={buttonPos.y - radius * 0.6} 
+                    textAnchor="middle" 
+                    fill="white" 
+                    fontSize={radius * 0.6}
+                    fontWeight="bold"
+                    pointerEvents="none"
                   >
                     ✓
-                  </div>
+                  </text>
                 )}
-              </button>
+              </g>
             );
           })}
-        </div>
+        </svg>
       </div>
 
       <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-sm rounded-lg p-2 shadow-md z-20">

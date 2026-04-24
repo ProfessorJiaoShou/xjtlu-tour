@@ -17,6 +17,23 @@ export function PanoramaViewer({ panoramaUrl, locationName, onClose }: PanoramaV
   const [gyroEnabled, setGyroEnabled] = useState(false);
   const [showGyroButton, setShowGyroButton] = useState(true);
 
+  // 检查设备是否支持陀螺仪
+  useEffect(() => {
+    // 检测是否为移动设备
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    if (!isMobile) {
+      setShowGyroButton(false);
+      console.log('Non-mobile device detected, hiding gyroscope button');
+    }
+    
+    // 检查陀螺仪支持
+    if (typeof DeviceOrientationEvent === 'undefined') {
+      console.log('DeviceOrientationEvent not supported');
+      setShowGyroButton(false);
+    }
+  }, []);
+
   useEffect(() => {
     if (!panoramaUrl) {
       setError('No panorama image available for this location');
@@ -44,7 +61,7 @@ export function PanoramaViewer({ panoramaUrl, locationName, onClose }: PanoramaV
           container: containerRef.current,
           panorama: panoramaUrl,
           caption: locationName,
-          defaultZoomLvl: 0,
+          defaultZoomLvl: 50, // 设置默认缩放级别
           mousewheel: true,
           navbar: [
             'zoom',
@@ -93,8 +110,30 @@ export function PanoramaViewer({ panoramaUrl, locationName, onClose }: PanoramaV
       }
     } else {
       try {
-        await viewerRef.current.startGyroscopeControl();
-        setGyroEnabled(true);
+        // 检查设备是否支持陀螺仪
+        if (typeof DeviceOrientationEvent !== 'undefined') {
+          // iOS 13+ 需要请求权限
+          if (typeof (DeviceOrientationEvent as any).requestPermission === 'function') {
+            try {
+              const permission = await (DeviceOrientationEvent as any).requestPermission();
+              if (permission === 'granted') {
+                await viewerRef.current.startGyroscopeControl();
+                setGyroEnabled(true);
+              } else {
+                setError('Gyroscope permission denied. Please allow access in your device settings.');
+              }
+            } catch (err) {
+              console.error('Permission request failed:', err);
+              setError('Failed to request gyroscope permission. Please check device settings.');
+            }
+          } else {
+            // Android和其他设备直接启用
+            await viewerRef.current.startGyroscopeControl();
+            setGyroEnabled(true);
+          }
+        } else {
+          setError('Your device does not support gyroscope or is not a mobile device.');
+        }
       } catch (err) {
         console.error('Failed to enable gyroscope:', err);
         setError('Unable to enable gyroscope. Please ensure your device supports it and permission is granted.');
@@ -104,20 +143,25 @@ export function PanoramaViewer({ panoramaUrl, locationName, onClose }: PanoramaV
 
   const handleZoomIn = () => {
     if (viewerRef.current) {
-      viewerRef.current.zoom(viewerRef.current.getZoomLevel() + 5);
+      const currentZoom = viewerRef.current.getZoomLevel();
+      const newZoom = Math.min(100, currentZoom + 10);
+      viewerRef.current.zoom(newZoom);
     }
   };
 
   const handleZoomOut = () => {
     if (viewerRef.current) {
-      viewerRef.current.zoom(viewerRef.current.getZoomLevel() - 5);
+      const currentZoom = viewerRef.current.getZoomLevel();
+      const newZoom = Math.max(0, currentZoom - 10);
+      viewerRef.current.zoom(newZoom);
     }
   };
 
   const handleReset = () => {
     if (viewerRef.current) {
-      viewerRef.current.zoom(0);
-      viewerRef.current.rotate({ yaw: 0, pitch: 0 });
+      // 使用正确的API重置视角
+      viewerRef.current.zoom(50); // 重置缩放
+      viewerRef.current.reset(); // 使用内置的reset方法
     }
   };
 
@@ -126,7 +170,7 @@ export function PanoramaViewer({ panoramaUrl, locationName, onClose }: PanoramaV
       const zoom = viewerRef.current.getZoomLevel();
       return Math.max(0, Math.min(100, Math.round(zoom)));
     }
-    return 0;
+    return 50; // 默认返回50%
   };
 
   return (
@@ -182,7 +226,7 @@ export function PanoramaViewer({ panoramaUrl, locationName, onClose }: PanoramaV
           </button>
         </div>
         <div className="bg-black/50 backdrop-blur-sm rounded-lg px-3 py-2 text-white text-xs">
-          Drag to rotate · Scroll to zoom · Gyroscope for mobile
+          {gyroEnabled ? 'Gyroscope enabled - Move device to explore' : 'Drag to rotate · Scroll to zoom · Gyroscope for mobile'}
         </div>
       </div>
 

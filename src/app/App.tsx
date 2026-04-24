@@ -6,6 +6,12 @@ import { TourProgress } from './components/TourProgress';
 import { PanoramaViewer } from './components/PanoramaViewer';
 
 import pano1 from '../imports/panoramas/1.JPG';
+import pano3 from '../imports/panoramas/3.JPG';
+import pano6 from '../imports/panoramas/6.JPG';
+import pano11 from '../imports/panoramas/11.JPG';
+
+
+
 
 export type Location = {
   id: string;
@@ -189,6 +195,9 @@ export default function App() {
   const getPanoramaUrl = (locationId: string) => {
     const panoramaMap: Record<string, string> = {
       '1': pano1,
+      '3':pano3,
+      '6':pano6,
+      '11':pano11,
     };
     return panoramaMap[locationId] || '';
   };
