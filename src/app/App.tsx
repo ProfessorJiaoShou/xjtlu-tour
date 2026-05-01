@@ -4,6 +4,7 @@ import { WelcomeScreen } from './components/WelcomeScreen';
 import { LocationDetail } from './components/LocationDetail';
 import { TourProgress } from './components/TourProgress';
 import { PanoramaViewer } from './components/PanoramaViewer';
+import { AMapView } from './components/AMapView'; // 新增高德地图组件
 
 import pano1 from '../imports/panoramas/1.JPG';
 import pano3 from '../imports/panoramas/3.JPG';
@@ -30,6 +31,11 @@ export default function App() {
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
   const [panoramaLocation, setPanoramaLocation] = useState<Location | null>(null);
   const [totalPoints, setTotalPoints] = useState(0);
+  const [mapMode, setMapMode] = useState<'custom' | 'amap'>('custom'); // 地图模式：custom-自定义地图，amap-高德地图
+
+  const toggleMapMode = () => {
+    setMapMode(prev => prev === 'custom' ? 'amap' : 'custom');
+  };
   const [locations, setLocations] = useState<Location[]>([
     {
       id: '1',
@@ -215,13 +221,22 @@ export default function App() {
         visitedCount={visitedCount}
         totalCount={totalLocations}
         points={totalPoints}
+        mapMode={mapMode}
+        onToggleMapMode={toggleMapMode}
       />
 
       <div className="flex-1 overflow-hidden">
-        <MapView
-          locations={locations}
-          onLocationSelect={handleLocationSelect}
-        />
+        {mapMode === 'custom' ? (
+          <MapView
+            locations={locations}
+            onLocationSelect={handleLocationSelect}
+          />
+        ) : (
+          <AMapView
+            locations={locations}
+            onLocationSelect={handleLocationSelect}
+          />
+        )}
       </div>
 
       {selectedLocation && (

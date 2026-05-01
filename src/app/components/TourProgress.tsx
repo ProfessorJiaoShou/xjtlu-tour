@@ -4,9 +4,11 @@ interface TourProgressProps {
   visitedCount: number;
   totalCount: number;
   points: number;
+  mapMode?: 'custom' | 'amap';
+  onToggleMapMode?: () => void;
 }
 
-export function TourProgress({ visitedCount, totalCount, points }: TourProgressProps) {
+export function TourProgress({ visitedCount, totalCount, points, mapMode = 'custom', onToggleMapMode }: TourProgressProps) {
   const percentage = (visitedCount / totalCount) * 100;
 
   return (
@@ -19,9 +21,24 @@ export function TourProgress({ visitedCount, totalCount, points }: TourProgressP
             <span className="text-gray-500">/{totalCount}</span> visited
           </span>
         </div>
-        <div className="flex items-center gap-2 bg-gradient-to-r from-yellow-400 to-orange-400 px-3 py-1 rounded-full">
-          <Trophy className="w-4 h-4 text-white" />
-          <span className="text-white">{points}</span>
+        <div className="flex items-center gap-4">
+          <button
+            onClick={onToggleMapMode}
+            className={`flex items-center gap-2 px-3 py-1 rounded-lg transition-all duration-200 ${
+              mapMode === 'custom' 
+                ? 'bg-blue-500 text-white hover:bg-blue-600' 
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            <MapPin className="w-4 h-4" />
+            <span className="text-sm font-medium">
+              {mapMode === 'custom' ? 'Custom Map' : 'AMap'}
+            </span>
+          </button>
+          <div className="flex items-center gap-2 bg-gradient-to-r from-yellow-400 to-orange-400 px-3 py-1 rounded-full">
+            <Trophy className="w-4 h-4 text-white" />
+            <span className="text-white">{points}</span>
+          </div>
         </div>
       </div>
       <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
