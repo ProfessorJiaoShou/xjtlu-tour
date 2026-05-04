@@ -14,6 +14,10 @@ export function AMapView({ locations, onLocationSelect }: AMapViewProps) {
 
   // 西交利物浦大学坐标（苏州工业园区）
   const xjtluCenter: [number, number] = [120.735, 31.264];
+  
+  // 从环境变量获取API密钥
+  const amapKey = import.meta.env.VITE_AMAP_KEY || '76098a9a85a43e2dd84ade8475cec962';
+  const securityCode = import.meta.env.VITE_AMAP_SECURITY_CODE || '84ce068129c5ca6c297cf65918adf524';
 
   useEffect(() => {
     if (!mapContainerRef.current || mapLoaded) return;
@@ -29,7 +33,7 @@ export function AMapView({ locations, onLocationSelect }: AMapViewProps) {
         // 根据文档要求：必须在加载前配置安全密钥
         console.log('配置安全密钥...');
         (window as any)._AMapSecurityConfig = {
-          securityJsCode: '84ce068129c5ca6c297cf65918adf524',
+          securityJsCode: securityCode,
         };
 
         console.log('安全密钥配置完成:', (window as any)._AMapSecurityConfig);
@@ -37,7 +41,7 @@ export function AMapView({ locations, onLocationSelect }: AMapViewProps) {
         // 使用官方AMapLoader加载地图
         console.log('开始加载AMapLoader...');
         AMap = await AMapLoader.load({
-          key: '76098a9a85a43e2dd84ade8475cec962',
+          key: amapKey,
           version: '2.0',
           plugins: [] // 不加载插件，只保留基础地图
         });
