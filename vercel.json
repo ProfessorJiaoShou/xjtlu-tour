@@ -4,9 +4,5 @@
   "framework": "vite",
   "installCommand": "pnpm install",
   "devCommand": "pnpm run dev",
-  "regions": ["hkg1"],
-  "env": {
-    "VITE_AMAP_KEY": "@amap-key",
-    "VITE_AMAP_SECURITY_CODE": "@amap-security-code"
-  }
+  "regions": ["hkg1"]
 }
