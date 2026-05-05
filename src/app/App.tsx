@@ -14,6 +14,8 @@ import pano3 from '../imports/panoramas/3.JPG';
 import pano6 from '../imports/panoramas/6.JPG';
 import pano11 from '../imports/panoramas/11.JPG';
 
+import cb from '../imports/photos/cb.jpg';
+
 
 
 
@@ -29,6 +31,7 @@ export type Location = {
   points: number;
   photos?: string[];
   userPhoto?: string;
+  visible?: boolean;
 };
 
 export default function App() {
@@ -51,23 +54,21 @@ export default function App() {
       name: 'Central Building (CB)',
       category: 'academic',
       description: 'The iconic main building of XJTLU, housing administrative offices and the main reception area.',
-      funFact: 'The Central Building was the first structure built on campus in 2006!',
+      funFact: 'The Central Building is famous for its appearance in many campus photos and is often the first stop for new students and visitors!',
       image: '🏛️',
       coordinates: { x: 48, y: 42 },
       visited: false,
       points: 10,
-      photos: [
-        'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800',
-        'https://images.unsplash.com/photo-1497366811353-6870744d04b2?w=800',
-        'https://images.unsplash.com/photo-1497215728101-856f4ea42174?w=800'
-      ]
+      photos: [cb],
+      visible: true
     },
+    //下面这个已经弃用
     {
       id: '2',
-      name: 'Library',
+      name: 'AS building (AS)',
       category: 'academic',
-      description: 'Modern academic library with extensive collections, study spaces, and 24/7 access during exams.',
-      funFact: 'The library holds over 400,000 books and provides access to millions of digital resources!',
+      description: 'Arts and Social Sciences building with lecture halls, seminar rooms, and art studios.',
+      funFact: 'The high quality photography and lighting equipment in AS building is available for students to use.',
       image: '📚',
       coordinates: { x: 30, y: 35 },
       visited: false,
@@ -76,62 +77,68 @@ export default function App() {
         'https://images.unsplash.com/photo-1568667256549-094345857637?w=800',
         'https://images.unsplash.com/photo-1521587760476-6c12a4b040da?w=800',
         'https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=800'
-      ]
+      ],
+      visible: true
     },
     {
       id: '3',
       name: 'Foundation Building (FB)',
       category: 'academic',
       description: 'Home to foundation year programs and language learning facilities.',
-      funFact: 'Every XJTLU student starts their journey with foundation courses here!',
+      funFact: 'The FB building is the oldest building in XJTLU which was built in 2006.',
       image: '📖',
       coordinates: { x: 42, y: 32 },
       visited: false,
-      points: 10
+      points: 10,
+      visible: true
     },
     {
       id: '4',
       name: 'South Campus Sports Field',
       category: 'recreation',
-      description: 'Professional sports complex with football field, running track, and basketball courts.',
+      description: 'Professional sports complex with football field, running track, and sport facilities for various sports.',
       funFact: 'The track hosts inter-university competitions throughout the year!',
       image: '⚽',
       coordinates: { x: 75, y: 75 },
       visited: false,
-      points: 10
+      points: 10,
+      visible: true
     },
     {
       id: '5',
       name: 'South Campus Lake',
       category: 'landmark',
       description: 'Beautiful scenic lake in the heart of South Campus, perfect for relaxation and photography.',
-      funFact: 'The lake features a unique circular design with bridges and walking paths!',
+      funFact: 'The swans are a popular attraction in the campus, known for their graceful movements!',
       image: '🌊',
       coordinates: { x: 50, y: 75 },
       visited: false,
-      points: 5
+      points: 5,
+      visible: true
     },
     {
       id: '6',
       name: 'Dining Hall',
       category: 'facility',
-      description: 'Multiple dining options including Chinese, Western, Japanese, and Korean cuisine.',
+      description: 'Multiple dining options including Chinese and Western cuisine.',
       funFact: 'Serves over 10,000 meals daily across multiple restaurants and cafes!',
       image: '🍜',
       coordinates: { x: 52, y: 48 },
       visited: false,
-      points: 5
+      points: 5,
+      visible: true
     },
     {
       id: '7',
       name: 'Engineering Building (EB)',
       category: 'academic',
       description: 'State-of-the-art engineering labs with robotics, electronics, and mechanical workshops.',
-      funFact: 'Home to advanced 3D printers, laser cutters, and CNC machines available to all students!',
+      funFact: 'Home to advanced 3D printers, laser cutters, and CNC machines available to all SAT students!',
       image: '⚙️',
       coordinates: { x: 58, y: 52 },
       visited: false,
-      points: 15
+      points: 15,
+      visible: true
     },
     {
       id: '8',
@@ -142,51 +149,56 @@ export default function App() {
       image: '💼',
       coordinates: { x: 62, y: 58 },
       visited: false,
-      points: 10
+      points: 10,
+      visible: true
     },
-    {
+    {//这个也弃用
       id: '9',
-      name: 'International Building (IB)',
+      name: 'Science Building (SA/SB/SC/SD)',
       category: 'academic',
-      description: 'Hub for international programs, language centers, and cultural exchange activities.',
-      funFact: 'Over 80 nationalities are represented in student programs here!',
+      description: 'Science building with lecture halls, labs, and study areas.',
+      funFact: 'Most students will lose their way in these buildings because the structure is quite complex!',
       image: '🌍',
       coordinates: { x: 46, y: 38 },
       visited: false,
-      points: 10
+      points: 10,
+      visible: true
     },
     {
       id: '10',
       name: 'Life Sciences Building (LS)',
       category: 'academic',
       description: 'Advanced biology and chemistry labs for cutting-edge research and teaching.',
-      funFact: 'Features specialized equipment for genetic research and molecular biology!',
+      funFact: 'LS is the latest building in XJTLU which was built in 2026.',
       image: '🔬',
       coordinates: { x: 22, y: 28 },
       visited: false,
-      points: 15
+      points: 15,
+      visible: true
     },
     {
       id: '11',
       name: 'Mathematics Building (MA)',
       category: 'academic',
       description: 'Dedicated space for mathematical sciences with computer labs and study areas.',
-      funFact: 'Houses one of the largest collections of mathematical texts in Suzhou!',
+      funFact: 'Most year1 students will have their first calculus class here!',
       image: '🔢',
       coordinates: { x: 56, y: 62 },
       visited: false,
-      points: 10
+      points: 10,
+      visible: true
     },
     {
       id: '12',
-      name: 'Academy Building (AG)',
+      name: 'Environmental Science Building (ES)',
       category: 'academic',
-      description: 'Multi-purpose academic building with modern classrooms and collaborative spaces.',
-      funFact: 'Features flexible learning spaces that can be reconfigured for different teaching styles!',
-      image: '🎓',
+      description: 'Dedicated space for environmental sciences with computer labs and study areas.',
+      funFact: 'ES building is the farest building from the dormitory so some students may late arrive.',
+      image: '🌳',
       coordinates: { x: 68, y: 38 },
       visited: false,
-      points: 10
+      points: 10,
+      visible: true
     }
   ]);
 

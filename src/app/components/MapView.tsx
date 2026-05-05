@@ -12,14 +12,14 @@ interface MapViewProps {
 // 坐标范围: x: 0-1000, y: 0-1000 (SVG视口坐标系)
 const buttonPositions: Record<string, { x: number; y: number; size: number }> = {
   '1': { x: 420, y: 555, size: 20 },   // 中心大楼 (CB)
-  '2': { x: 550, y: 450, size: 20 },   // 西安交通大学研究院 (XJRI)
+  '2': { x: 500, y: 700, size: 20 },   // AS building (AS)
   '3': { x: 410, y: 460, size: 20 },   // 基础教学楼 (FB)
   '4': { x: 720, y: 750, size: 20 },   // 南校区运动场
   '5': { x: 570, y: 790, size: 20 },   // 南校区湖泊
   '6': { x: 630, y: 550, size: 15 },   // 食堂
   '7': { x: 700, y: 580, size: 20 },   // 工程大楼 (EB)
-  '8': { x: 520, y: 710, size: 20 },   // 商学院 (BS)
-  '9': { x: 599, y: 250, size: 20 },   // 生活区 (LA)  
+  '8': { x: 520, y: 800, size: 20 },   // 商学院 (BS)
+  '9': { x: 525, y: 555, size: 20 },   // science building 
   '10': { x: 300, y: 300, size: 20 },  // 生命科学大楼 (LS)
   '11': { x: 700, y: 500, size: 20 },  // 数学大楼 (MA)
   '12': { x: 580, y: 900, size: 20 },  // 环境科学大楼 (ES)
@@ -105,7 +105,7 @@ export function MapView({ locations, onLocationSelect }: MapViewProps) {// 地�
           preserveAspectRatio="xMidYMid meet"
         >
           {/* 地点标记按钮 - 使用SVG确保按钮与地图同步缩放 */}
-          {locations.map((location) => {
+          {locations.filter(loc => loc.visible).map((location) => {
             const buttonPos = buttonPositions[location.id] || { x: 500, y: 500, size: 20 };
             const radius = buttonPos.size;
             
