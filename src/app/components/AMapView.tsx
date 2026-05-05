@@ -19,7 +19,7 @@ export function AMapView({ locations, onLocationSelect }: AMapViewProps) {
   const [mapLoaded, setMapLoaded] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
 
-  // 西交利物浦大学坐标（苏州工业园区）
+  // XJTLU coordinates (Suzhou Industrial Park)
   const xjtluCenter: [number, number] = [120.735, 31.264];
 
   useEffect(() => {
@@ -181,29 +181,29 @@ export function AMapView({ locations, onLocationSelect }: AMapViewProps) {
         className="w-full h-full"
       />
       
-      {/* 加载状态 */}
+      {/* Loading state */}
       {!mapLoaded && !mapError && (
         <div className="absolute inset-0 flex items-center justify-center bg-white/80">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">正在加载高德地图...</p>
-            <p className="text-gray-400 text-sm mt-2">AMapLoader状态: {window.AMapLoader ? '✅ 已加载' : '❌ 未加载'}</p>
+            <p className="text-gray-600">Loading AMap...</p>
+            <p className="text-gray-400 text-sm mt-2">AMapLoader status: {window.AMapLoader ? '✅ Loaded' : '❌ Not loaded'}</p>
           </div>
         </div>
       )}
       
-      {/* 错误状态 */}
+      {/* Error state */}
       {mapError && (
         <div className="absolute inset-0 flex items-center justify-center bg-red-50/80">
           <div className="text-center">
             <div className="text-red-500 text-4xl mb-4">❌</div>
-            <p className="text-red-600 font-medium">地图加载失败</p>
+            <p className="text-red-600 font-medium">Map loading failed</p>
             <p className="text-red-500 text-sm mt-2">{mapError}</p>
             <button 
               onClick={() => window.location.reload()}
               className="mt-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
             >
-              刷新页面重试
+              Refresh to retry
             </button>
           </div>
         </div>

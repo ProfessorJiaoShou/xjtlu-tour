@@ -39,8 +39,8 @@ export function PhotoAlbum({ locations, onClose, isCompletion = false }: PhotoAl
     if (currentPhoto && navigator.share) {
       try {
         await navigator.share({
-          title: `我在 ${currentPhoto.location.name} 的打卡照片`,
-          text: `我在西交利物浦大学 ${currentPhoto.location.name} 完成了打卡！`,
+          title: `My photo at ${currentPhoto.location.name}`,
+          text: `I completed check-in at ${currentPhoto.location.name} at XJTLU!`,
           url: window.location.href
         });
       } catch (err) {
@@ -67,13 +67,13 @@ export function PhotoAlbum({ locations, onClose, isCompletion = false }: PhotoAl
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90">
         <div className="bg-white rounded-lg p-8 max-w-md text-center">
           <X className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-          <h3 className="text-xl font-semibold mb-2">暂无照片</h3>
-          <p className="text-gray-600 mb-6">您还没有拍摄任何打卡照片</p>
+          <h3 className="text-xl font-semibold mb-2">No Photos Yet</h3>
+          <p className="text-gray-600 mb-6">You haven't taken any check-in photos yet</p>
           <button
             onClick={onClose}
             className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg"
           >
-            关闭
+            Close
           </button>
         </div>
       </div>
@@ -137,24 +137,24 @@ export function PhotoAlbum({ locations, onClose, isCompletion = false }: PhotoAl
           {isCompletion ? (
             <div className="flex items-center gap-2">
               <Trophy className="w-5 h-5 text-yellow-400" />
-              <span>🎉 恭喜您完成所有地点打卡！</span>
+              <span>🎉 Congratulations! You've completed all locations!</span>
             </div>
           ) : (
-            <p>滑动查看您的打卡照片</p>
+            <p>Swipe to view your check-in photos</p>
           )}
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={handleDownload}
             className="bg-black/50 backdrop-blur-sm rounded-full p-3 text-white hover:bg-black/70 transition-colors"
-            title="下载照片"
+            title="Download photo"
           >
             <Download className="w-5 h-5" />
           </button>
           <button
             onClick={handleShare}
             className="bg-black/50 backdrop-blur-sm rounded-full p-3 text-white hover:bg-black/70 transition-colors"
-            title="分享"
+            title="Share"
           >
             <Share2 className="w-5 h-5" />
           </button>

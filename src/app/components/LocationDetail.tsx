@@ -155,6 +155,13 @@ export function LocationDetail({ location, onClose, onVisit, onViewPanorama }: L
             <p className="text-gray-600 leading-relaxed">
               {location.description}
             </p>
+            <div className="mt-3 bg-blue-50 border border-blue-200 rounded-lg p-3">
+              <div className="flex items-center gap-2 text-blue-700">
+                <span className="text-lg">🌐</span>
+                <span className="text-sm font-medium">360° Panorama Available</span>
+              </div>
+              <p className="text-xs text-blue-600 mt-1">Tap the button below to explore immersive panoramic views</p>
+            </div>
           </div>
 
           <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-r-lg">

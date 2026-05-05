@@ -1,4 +1,4 @@
-import { Compass, Map, Sparkles } from 'lucide-react';
+import { Compass, Map, Camera } from 'lucide-react';
 
 interface WelcomeScreenProps {
   onStart: () => void;
@@ -18,11 +18,11 @@ export function WelcomeScreen({ onStart }: WelcomeScreenProps) {
       </div>
 
       <p className="text-xl mb-2 text-center opacity-90">
-        Your Interactive AR Tour Guide
+        Your 360° Panorama Tour Guide
       </p>
 
       <p className="text-sm mb-12 text-center opacity-75 max-w-md">
-        Discover all 12 campus locations, unlock fun facts, and collect points as you explore!
+        Experience immersive 360° panoramic views of all 12 campus locations, check-in with photos, and collect points!
       </p>
 
       <div className="grid grid-cols-3 gap-6 mb-12 w-full max-w-md">
@@ -34,15 +34,15 @@ export function WelcomeScreen({ onStart }: WelcomeScreenProps) {
         </div>
         <div className="flex flex-col items-center">
           <div className="bg-white/20 backdrop-blur-sm rounded-full p-4 mb-2">
-            <Sparkles className="w-8 h-8" />
+            <span className="text-2xl">🌐</span>
           </div>
-          <p className="text-xs text-center">AR Scanner</p>
+          <p className="text-xs text-center">360° Panorama</p>
         </div>
         <div className="flex flex-col items-center">
           <div className="bg-white/20 backdrop-blur-sm rounded-full p-4 mb-2">
-            <span className="text-2xl">🏆</span>
+            <Camera className="w-8 h-8" />
           </div>
-          <p className="text-xs text-center">Earn Points</p>
+          <p className="text-xs text-center">Photo Check-in</p>
         </div>
       </div>
 

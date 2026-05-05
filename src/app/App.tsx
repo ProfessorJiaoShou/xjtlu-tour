@@ -40,7 +40,7 @@ export default function App() {
   const [showPhotoAlbum, setShowPhotoAlbum] = useState(false);
   const [showCompletionAlbum, setShowCompletionAlbum] = useState(false);
   const [totalPoints, setTotalPoints] = useState(0);
-  const [mapMode, setMapMode] = useState<'custom' | 'amap'>('custom'); // 地图模式：custom-自定义地图，amap-高德地图
+  const [mapMode, setMapMode] = useState<'custom' | 'amap'>('custom'); // Map mode: custom - custom map, amap - Amap
 
   const toggleMapMode = () => {
     setMapMode(prev => prev === 'custom' ? 'amap' : 'custom');

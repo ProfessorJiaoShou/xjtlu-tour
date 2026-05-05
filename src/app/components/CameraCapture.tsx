@@ -20,7 +20,7 @@ export function CameraCapture({ locationName, onCapture, onClose }: CameraCaptur
   useEffect(() => {
     async function initCamera() {
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        setError('您的浏览器不支持摄像头访问');
+        setError('Your browser does not support camera access');
         return;
       }
 
@@ -47,20 +47,20 @@ export function CameraCapture({ locationName, onCapture, onClose }: CameraCaptur
           
           videoRef.current.onerror = (e) => {
             console.error('Video error:', e);
-            setError('摄像头加载失败，请检查设备权限');
+            setError('Camera failed to load, please check device permissions');
           };
         }
       } catch (err: any) {
         console.error('Camera access error:', err);
         
         if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
-          setError('摄像头权限被拒绝，请在设置中允许访问');
+          setError('Camera permission denied, please allow access in settings');
         } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
-          setError('未找到摄像头设备');
+          setError('Camera device not found');
         } else if (err.name === 'NotReadableError') {
-          setError('摄像头被其他应用占用');
+          setError('Camera is being used by another application');
         } else {
-          setError(`无法访问摄像头: ${err.message || '未知错误'}`);
+          setError(`Unable to access camera: ${err.message || 'Unknown error'}`);
         }
       }
     }
@@ -116,7 +116,7 @@ export function CameraCapture({ locationName, onCapture, onClose }: CameraCaptur
       <div className="absolute top-4 left-4 right-4 z-10 flex items-center justify-between">
         <div className="bg-black/50 backdrop-blur-sm rounded-lg px-4 py-2 text-white">
           <p className="font-medium">{locationName}</p>
-          <p className="text-sm text-gray-300">拍照打卡</p>
+          <p className="text-sm text-gray-300">Take Photo</p>
         </div>
         <button
           onClick={onClose}
@@ -133,7 +133,7 @@ export function CameraCapture({ locationName, onCapture, onClose }: CameraCaptur
               <div className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
                 <X className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-xl font-bold mb-4">无法访问摄像头</h3>
+              <h3 className="text-xl font-bold mb-4">Unable to Access Camera</h3>
               <p className="text-gray-300 mb-6">{error}</p>
             </div>
             <>
@@ -142,13 +142,13 @@ export function CameraCapture({ locationName, onCapture, onClose }: CameraCaptur
                   onClick={handleRetry}
                   className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg"
                 >
-                  重试 ({retryCount})
+                  Retry ({retryCount})
                 </button>
                 <button
                   onClick={onClose}
                   className="flex-1 bg-white text-black px-6 py-3 rounded-lg"
                 >
-                  关闭
+                  Close
                 </button>
               </div>
             </>
@@ -172,7 +172,7 @@ export function CameraCapture({ locationName, onCapture, onClose }: CameraCaptur
               <div className="absolute inset-0 flex items-center justify-center bg-black/50">
                 <div className="text-white text-center">
                   <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
-                  <p className="text-sm">正在加载摄像头...</p>
+                  <p className="text-sm">Loading camera...</p>
                 </div>
               </div>
             )}
@@ -189,7 +189,7 @@ export function CameraCapture({ locationName, onCapture, onClose }: CameraCaptur
             className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white px-8 py-3 rounded-full flex items-center gap-2 transition-colors"
           >
             <Camera className="w-5 h-5" />
-            确认打卡
+            Confirm
           </button>
         ) : (
           <button

@@ -25,14 +25,14 @@ export function CheckInSuccess({ location, onClose, onTakePhoto }: CheckInSucces
               <CheckCircle className="w-10 h-10 text-white" />
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              打卡成功！
+              Check-in Successful!
             </h2>
             <p className="text-gray-600 mb-1">
               {location.name}
             </p>
             <div className="flex items-center justify-center gap-2 mt-4">
               <span className="text-4xl font-bold text-green-600">+{location.points}</span>
-              <span className="text-gray-500">积分</span>
+              <span className="text-gray-500">Points</span>
             </div>
           </div>
 
@@ -42,7 +42,7 @@ export function CheckInSuccess({ location, onClose, onTakePhoto }: CheckInSucces
               className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 rounded-lg hover:shadow-lg transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-2"
             >
               <Camera className="w-5 h-5" />
-              拍照留念
+              Take Photo
             </button>
             
             <button
@@ -50,7 +50,7 @@ export function CheckInSuccess({ location, onClose, onTakePhoto }: CheckInSucces
               className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-lg transition-all flex items-center justify-center gap-2"
             >
               <SkipForward className="w-5 h-5" />
-              稍后再拍
+              Skip for Now
             </button>
           </div>
         </div>
