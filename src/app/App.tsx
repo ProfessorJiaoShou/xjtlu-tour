@@ -14,7 +14,7 @@ import pano3 from '../imports/panoramas/3.JPG';
 import pano6 from '../imports/panoramas/6.JPG';
 import pano11 from '../imports/panoramas/11.JPG';
 
-import cb from '../imports/photos/cb.jpg';
+import cb from '../imports/photos/cb.JPG';
 
 
 
