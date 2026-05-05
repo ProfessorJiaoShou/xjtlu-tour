@@ -4,7 +4,7 @@ import { WelcomeScreen } from './components/WelcomeScreen';
 import { LocationDetail } from './components/LocationDetail';
 import { TourProgress } from './components/TourProgress';
 import { PanoramaViewer } from './components/PanoramaViewer';
-import { AMapView } from './components/AMapView'; // 新增高德地图组件
+import { AMapView } from './components/AMapView';
 
 import pano1 from '../imports/panoramas/1.JPG';
 import pano3 from '../imports/panoramas/3.JPG';
@@ -24,6 +24,7 @@ export type Location = {
   coordinates: { x: number; y: number };
   visited: boolean;
   points: number;
+  photos?: string[];
 };
 
 export default function App() {
@@ -46,7 +47,12 @@ export default function App() {
       image: '🏛️',
       coordinates: { x: 48, y: 42 },
       visited: false,
-      points: 10
+      points: 10,
+      photos: [
+        'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800',
+        'https://images.unsplash.com/photo-1497366811353-6870744d04b2?w=800',
+        'https://images.unsplash.com/photo-1497215728101-856f4ea42174?w=800'
+      ]
     },
     {
       id: '2',
@@ -57,7 +63,12 @@ export default function App() {
       image: '📚',
       coordinates: { x: 30, y: 35 },
       visited: false,
-      points: 15
+      points: 15,
+      photos: [
+        'https://images.unsplash.com/photo-1568667256549-094345857637?w=800',
+        'https://images.unsplash.com/photo-1521587760476-6c12a4b040da?w=800',
+        'https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=800'
+      ]
     },
     {
       id: '3',
