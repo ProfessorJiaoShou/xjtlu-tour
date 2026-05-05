@@ -38,8 +38,8 @@ export function LocationDetail({ location, onClose, onVisit, onViewPanorama }: L
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 backdrop-blur-sm">
-      <div className="bg-white rounded-t-3xl w-full max-w-lg max-h-[85vh] overflow-hidden shadow-2xl animate-slide-up">
-        <div className="relative">
+      <div className="bg-white rounded-t-3xl w-full max-w-lg max-h-[85vh] shadow-2xl animate-slide-up flex flex-col">
+        <div className="relative flex-shrink-0">
           <button
             onClick={onClose}
             className="absolute top-4 right-4 z-20 p-2 bg-black/50 backdrop-blur-sm rounded-full hover:bg-black/70 transition-colors text-white"
@@ -179,20 +179,24 @@ export function LocationDetail({ location, onClose, onVisit, onViewPanorama }: L
             </div>
           </div>
 
-          {!location.visited ? (
-            <button
-              onClick={handleMarkVisited}
-              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 rounded-lg hover:shadow-lg transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-2"
-            >
-              <CheckCircle className="w-5 h-5" />
-              Mark as Visited
-            </button>
-          ) : (
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
-              <CheckCircle className="w-8 h-8 text-green-600 mx-auto mb-2" />
-              <p className="text-green-800">You've explored this location!</p>
-              <p className="text-sm text-green-600 mt-1">Keep exploring to earn more points</p>
-            </div>
+           {!showPhotos && (
+            <>
+              {!location.visited ? (
+                <button
+                  onClick={handleMarkVisited}
+                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 rounded-lg hover:shadow-lg transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-2"
+                >
+                  <CheckCircle className="w-5 h-5" />
+                  Mark as Visited
+                </button>
+              ) : (
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
+                  <CheckCircle className="w-8 h-8 text-green-600 mx-auto mb-2" />
+                  <p className="text-green-800">You've explored this location!</p>
+                  <p className="text-sm text-green-600 mt-1">Keep exploring to earn more points</p>
+                </div>
+              )}
+            </>
           )}
 
           {onViewPanorama && (

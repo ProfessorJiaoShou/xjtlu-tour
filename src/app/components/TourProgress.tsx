@@ -1,4 +1,4 @@
-import { Trophy, MapPin } from 'lucide-react';
+import { Trophy, MapPin, Camera } from 'lucide-react';
 
 interface TourProgressProps {
   visitedCount: number;
@@ -6,9 +6,11 @@ interface TourProgressProps {
   points: number;
   mapMode?: 'custom' | 'amap';
   onToggleMapMode?: () => void;
+  onOpenPhotoAlbum?: () => void;
+  hasUserPhotos?: boolean;
 }
 
-export function TourProgress({ visitedCount, totalCount, points, mapMode = 'custom', onToggleMapMode }: TourProgressProps) {
+export function TourProgress({ visitedCount, totalCount, points, mapMode = 'custom', onToggleMapMode, onOpenPhotoAlbum, hasUserPhotos }: TourProgressProps) {
   const percentage = (visitedCount / totalCount) * 100;
 
   return (
@@ -35,6 +37,15 @@ export function TourProgress({ visitedCount, totalCount, points, mapMode = 'cust
               {mapMode === 'custom' ? 'Custom Map' : 'AMap'}
             </span>
           </button>
+          {hasUserPhotos && onOpenPhotoAlbum && (
+            <button
+              onClick={onOpenPhotoAlbum}
+              className="flex items-center gap-2 px-3 py-1 rounded-lg bg-gradient-to-r from-pink-500 to-rose-500 text-white hover:from-pink-600 hover:to-rose-600 transition-all duration-200"
+            >
+              <Camera className="w-4 h-4" />
+              <span className="text-sm font-medium">My Photos</span>
+            </button>
+          )}
           <div className="flex items-center gap-2 bg-gradient-to-r from-yellow-400 to-orange-400 px-3 py-1 rounded-full">
             <Trophy className="w-4 h-4 text-white" />
             <span className="text-white">{points}</span>

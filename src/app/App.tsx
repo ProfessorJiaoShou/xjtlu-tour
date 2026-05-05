@@ -1,10 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { MapView } from './components/MapView';
 import { WelcomeScreen } from './components/WelcomeScreen';
 import { LocationDetail } from './components/LocationDetail';
 import { TourProgress } from './components/TourProgress';
 import { PanoramaViewer } from './components/PanoramaViewer';
 import { AMapView } from './components/AMapView';
+import { CameraCapture } from './components/CameraCapture';
+import { PhotoAlbum } from './components/PhotoAlbum';
+import { CheckInSuccess } from './components/CheckInSuccess';
 
 import pano1 from '../imports/panoramas/1.JPG';
 import pano3 from '../imports/panoramas/3.JPG';
@@ -25,12 +28,17 @@ export type Location = {
   visited: boolean;
   points: number;
   photos?: string[];
+  userPhoto?: string;
 };
 
 export default function App() {
   const [showWelcome, setShowWelcome] = useState(true);
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
   const [panoramaLocation, setPanoramaLocation] = useState<Location | null>(null);
+  const [checkInSuccessLocation, setCheckInSuccessLocation] = useState<Location | null>(null);
+  const [cameraLocation, setCameraLocation] = useState<Location | null>(null);
+  const [showPhotoAlbum, setShowPhotoAlbum] = useState(false);
+  const [showCompletionAlbum, setShowCompletionAlbum] = useState(false);
   const [totalPoints, setTotalPoints] = useState(0);
   const [mapMode, setMapMode] = useState<'custom' | 'amap'>('custom'); // 地图模式：custom-自定义地图，amap-高德地图
 
@@ -183,13 +191,61 @@ export default function App() {
   ]);
 
   const handleLocationVisit = (locationId: string) => {
-    setLocations(prev => prev.map(loc => {
-      if (loc.id === locationId && !loc.visited) {
-        setTotalPoints(points => points + loc.points);
-        return { ...loc, visited: true };
-      }
-      return loc;
-    }));
+    const location = locations.find(loc => loc.id === locationId);
+    if (location && !location.visited) {
+      setLocations(prev => prev.map(loc => {
+        if (loc.id === locationId) {
+          setTotalPoints(points => points + loc.points);
+          return { ...loc, visited: true };
+        }
+        return loc;
+      }));
+      setCheckInSuccessLocation(location);
+      setSelectedLocation(null);
+    }
+  };
+
+  const handleCameraCapture = (photoData: string) => {
+    if (cameraLocation) {
+      setLocations(prev => prev.map(loc => {
+        if (loc.id === cameraLocation.id) {
+          return { ...loc, userPhoto: photoData };
+        }
+        return loc;
+      }));
+      setCameraLocation(null);
+    }
+  };
+
+  const handleCloseCheckInSuccess = () => {
+    setCheckInSuccessLocation(null);
+  };
+
+  const handleOpenCameraFromSuccess = () => {
+    if (checkInSuccessLocation) {
+      setCameraLocation(checkInSuccessLocation);
+      setCheckInSuccessLocation(null);
+    }
+  };
+
+  const handleCloseCamera = () => {
+    setCameraLocation(null);
+  };
+
+  const handleOpenPhotoAlbum = () => {
+    setShowPhotoAlbum(true);
+  };
+
+  const handleClosePhotoAlbum = () => {
+    setShowPhotoAlbum(false);
+  };
+
+  const handleOpenCompletionAlbum = () => {
+    setShowCompletionAlbum(true);
+  };
+
+  const handleCloseCompletionAlbum = () => {
+    setShowCompletionAlbum(false);
   };
 
   const handleLocationSelect = (location: Location) => {
@@ -208,6 +264,12 @@ export default function App() {
   const handleClosePanorama = () => {
     setPanoramaLocation(null);
   };
+
+  useEffect(() => {
+    const allVisited = locations.every(loc => loc.visited && loc.userPhoto);
+    if (allVisited && !showCompletionAlbum) {     handleOpenCompletionAlbum();
+    }
+  }, [locations]);
 
   const getPanoramaUrl = (locationId: string) => {
     const panoramaMap: Record<string, string> = {
@@ -234,6 +296,8 @@ export default function App() {
         points={totalPoints}
         mapMode={mapMode}
         onToggleMapMode={toggleMapMode}
+        onOpenPhotoAlbum={handleOpenPhotoAlbum}
+        hasUserPhotos={locations.some(loc => loc.userPhoto)}
       />
 
       <div className="flex-1 overflow-hidden">
@@ -264,6 +328,37 @@ export default function App() {
           panoramaUrl={getPanoramaUrl(panoramaLocation.id)}
           locationName={panoramaLocation.name}
           onClose={handleClosePanorama}
+        />
+      )}
+
+      {checkInSuccessLocation && (
+        <CheckInSuccess
+          location={checkInSuccessLocation}
+          onClose={handleCloseCheckInSuccess}
+          onTakePhoto={handleOpenCameraFromSuccess}
+        />
+      )}
+
+      {cameraLocation && (
+        <CameraCapture
+          locationName={cameraLocation.name}
+          onCapture={handleCameraCapture}
+          onClose={handleCloseCamera}
+        />
+      )}
+
+      {showPhotoAlbum && (
+        <PhotoAlbum
+          locations={locations}
+          onClose={handleClosePhotoAlbum}
+        />
+      )}
+
+      {showCompletionAlbum && (
+        <PhotoAlbum
+          locations={locations}
+          onClose={handleCloseCompletionAlbum}
+          isCompletion={true}
         />
       )}
     </div>
