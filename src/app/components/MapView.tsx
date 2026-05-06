@@ -2,10 +2,12 @@ import { useState, useRef, useEffect } from 'react';
 import { Location } from '../App';
 import { Navigation, Info, ZoomIn, ZoomOut, RotateCcw, ChevronDown, ChevronUp } from 'lucide-react';
 import campusMapImage from '../../imports/xjtlu.png';
+import { RealTimeLocation } from './RealTimeLocation';
 
 interface MapViewProps {
   locations: Location[];// 位置数据列表
   onLocationSelect: (location: Location) => void;// 选择位置回调函数
+  showRealTimeLocation?: boolean;// 是否显示实时位置功能
 };//地图属性接口
 
 // 📍 SVG按钮位置配置 - 使用SVG坐标系统
@@ -25,12 +27,13 @@ const buttonPositions: Record<string, { x: number; y: number; size: number }> = 
   '12': { x: 580, y: 900, size: 20 },  // 环境科学大楼 (ES)
 };
 
-export function MapView({ locations, onLocationSelect }: MapViewProps) {// 地图组件
+export function MapView({ locations, onLocationSelect, showRealTimeLocation = true }: MapViewProps) {// 地图组件
   const [scale, setScale] = useState(1);// 缩放比例
   const [position, setPosition] = useState({ x: 0, y: 0 });// 地图位置
   const [isDragging, setIsDragging] = useState(false);// 是否正在拖动
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });//拖拽开始位置
-  const [showInfo, setShowInfo] = useState(true);// 是否显示信息  
+  const [showInfo, setShowInfo] = useState(true);// 是否显示信息
+  const [userPosition, setUserPosition] = useState<{ latitude: number; longitude: number; accuracy: number } | null>(null);
   
   // 使用ref来引用SVG容器
   const svgContainerRef = useRef<HTMLDivElement>(null);
@@ -69,6 +72,11 @@ export function MapView({ locations, onLocationSelect }: MapViewProps) {// 地�
   const handleMouseUp = () => {
     setIsDragging(false);
   };
+
+  // 处理位置更新
+  const handleLocationUpdate = (position: { latitude: number; longitude: number; accuracy: number }) => {
+    setUserPosition(position);
+  };
   
   const resetView = () => {
     setScale(1);
@@ -77,6 +85,13 @@ export function MapView({ locations, onLocationSelect }: MapViewProps) {// 地�
   
   return (
     <div className="h-full w-full relative bg-white overflow-hidden">
+      {/* 实时位置组件 */}
+      {showRealTimeLocation && (
+        <RealTimeLocation 
+          onLocationUpdate={handleLocationUpdate}
+          showAccuracy={true}
+        />
+      )}
       {/* 地图容器 - 使用图片背景和SVG按钮 */}
       <div 
         ref={svgContainerRef}
