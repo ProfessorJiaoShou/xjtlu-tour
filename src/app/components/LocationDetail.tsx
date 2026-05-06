@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Location } from '../App';
-import { X, MapPin, Zap, Lightbulb, CheckCircle, Navigation, Camera, Images, ChevronLeft, ChevronRight } from 'lucide-react';
+import { X, MapPin, Zap, Lightbulb, CheckCircle, Navigation, Camera, Images, ChevronLeft, ChevronRight, LayoutGrid, ZoomIn, ZoomOut, RotateCw } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from './ui/carousel';
 
@@ -10,12 +10,29 @@ interface LocationDetailProps {
   onVisit: (locationId: string) => void;
   onViewPanorama?: (location: Location) => void;
   onViewPhotos?: (location: Location) => void;
+  floorPlanUrl?: string;
 }
 
-export function LocationDetail({ location, onClose, onVisit, onViewPanorama }: LocationDetailProps) {
+export function LocationDetail({ location, onClose, onVisit, onViewPanorama, floorPlanUrl }: LocationDetailProps) {
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
   const [showPhotos, setShowPhotos] = useState(false);
+  const [showFloorPlan, setShowFloorPlan] = useState(false);
+  const [floorPlanScale, setFloorPlanScale] = useState(1);
+  const [isClosing, setIsClosing] = useState(false);
   const photos = location.photos || [];
+
+  const handleClose = () => {
+    setIsClosing(true);
+    setTimeout(() => {
+      onClose();
+    }, 300);
+  };
+
+  const handleFloorPlanWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    const delta = e.deltaY > 0 ? -0.1 : 0.1;
+    setFloorPlanScale(prev => Math.max(0.5, Math.min(3, prev + delta)));
+  };
 
   const handleMarkVisited = () => {
     if (!location.visited) {
@@ -38,10 +55,10 @@ export function LocationDetail({ location, onClose, onVisit, onViewPanorama }: L
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 backdrop-blur-sm">
-      <div className="bg-white rounded-t-3xl w-full max-w-lg max-h-[85vh] shadow-2xl animate-slide-up flex flex-col">
+      <div className={`bg-white rounded-t-3xl w-full max-w-lg max-h-[85vh] shadow-2xl flex flex-col ${isClosing ? 'animate-slide-down' : 'animate-slide-up'}`}>
         <div className="relative flex-shrink-0">
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="absolute top-4 right-4 z-20 p-2 bg-black/50 backdrop-blur-sm rounded-full hover:bg-black/70 transition-colors text-white"
           >
             <X className="w-5 h-5" />
@@ -215,8 +232,73 @@ export function LocationDetail({ location, onClose, onVisit, onViewPanorama }: L
               360° View
             </button>
           )}
+
+          {floorPlanUrl && (
+            <button
+              onClick={() => setShowFloorPlan(true)}
+              className="w-full bg-gradient-to-r from-green-600 to-teal-600 text-white py-3 rounded-lg hover:shadow-lg transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-2"
+            >
+              <LayoutGrid className="w-5 h-5" />
+              View Floor Plan
+            </button>
+          )}
         </div>
       </div>
+
+      {showFloorPlan && floorPlanUrl && (
+        <div 
+          className="fixed inset-0 z-[60] bg-black/90 flex items-center justify-center"
+          onClick={() => setShowFloorPlan(false)}
+        >
+          <div className="relative max-w-4xl w-full h-full p-4" onClick={(e) => e.stopPropagation()}>
+            <button
+              onClick={() => setShowFloorPlan(false)}
+              className="absolute top-6 right-6 z-10 bg-black/50 backdrop-blur-sm rounded-full p-3 text-white hover:bg-black/70 transition-colors"
+            >
+              <X className="w-6 h-6" />
+            </button>
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 bg-black/50 backdrop-blur-sm rounded-lg px-4 py-2 flex items-center gap-4">
+              <button
+                onClick={() => setFloorPlanScale(prev => Math.max(0.5, prev - 0.25))}
+                className="hover:bg-white/20 rounded-full p-2 transition-colors text-white"
+                title="Zoom Out"
+              >
+                <ZoomOut className="w-5 h-5" />
+              </button>
+              <span className="text-white text-sm min-w-[4rem] text-center">{Math.round(floorPlanScale * 100)}%</span>
+              <button
+                onClick={() => setFloorPlanScale(prev => Math.min(3, prev + 0.25))}
+                className="hover:bg-white/20 rounded-full p-2 transition-colors text-white"
+                title="Zoom In"
+              >
+                <ZoomIn className="w-5 h-5" />
+              </button>
+              <div className="w-px h-6 bg-white/30" />
+              <button
+                onClick={() => setFloorPlanScale(1)}
+                className="hover:bg-white/20 rounded-full p-2 transition-colors text-white"
+                title="Reset"
+              >
+                <RotateCw className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="h-full flex flex-col items-center justify-center">
+              <h3 className="text-white text-xl font-semibold mb-4">{location.name} - Floor Plan</h3>
+              <div 
+                className="flex-1 w-full bg-white rounded-lg overflow-hidden flex items-center justify-center"
+                onWheel={handleFloorPlanWheel}
+              >
+                <img 
+                  src={floorPlanUrl} 
+                  alt={`${location.name} Floor Plan`}
+                  className="object-contain transition-transform duration-200"
+                  style={{ transform: `scale(${floorPlanScale})` }}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

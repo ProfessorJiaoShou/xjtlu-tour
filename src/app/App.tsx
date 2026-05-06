@@ -32,6 +32,7 @@ export type Location = {
   photos?: string[];
   userPhoto?: string;
   visible?: boolean;
+  floorPlanUrl?: string;
 };
 
 export default function App() {
@@ -60,7 +61,8 @@ export default function App() {
       visited: false,
       points: 10,
       photos: [cb],
-      visible: true
+      visible: true,
+      floorPlanUrl: [cb]
     },
     //下面这个已经弃用
     {
@@ -332,6 +334,7 @@ export default function App() {
           onClose={handleCloseDetail}
           onVisit={handleLocationVisit}
           onViewPanorama={handleViewPanorama}
+          floorPlanUrl={selectedLocation.floorPlanUrl}
         />
       )}
 
