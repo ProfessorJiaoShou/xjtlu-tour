@@ -26,6 +26,15 @@ importers:
       '@mui/material':
         specifier: 7.3.5
         version: 7.3.5(@emotion/react@11.14.0(@types/react@19.2.14)(react@18.3.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.14)(react@18.3.1))(@types/react@19.2.14)(react@18.3.1))(@types/react@19.2.14)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@photo-sphere-viewer/core':
+        specifier: ^5.14.1
+        version: 5.14.1
+      '@photo-sphere-viewer/gyroscope-plugin':
+        specifier: 5.14.1
+        version: 5.14.1(@photo-sphere-viewer/core@5.14.1)
+      '@photo-sphere-viewer/parent':
+        specifier: file:C:/Users/wyf/Documents/office/cpt/333/Photo-Sphere-Viewer-5.14.1.tar.gz
+        version: file:Photo-Sphere-Viewer-5.14.1.tar.gz
       '@popperjs/core':
         specifier: 2.11.8
         version: 2.11.8
@@ -1044,6 +1053,19 @@ packages:
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [x64]
     os: [win32]
+
+  '@photo-sphere-viewer/core@5.14.1':
+    resolution: {integrity: sha512-qrwUudrX9YZms4c2shlY/H3jUP0oh9FyGEqIDr/95ulNZgKbhQ6C/i8zDQ4j8ooFR4+z5FDORQtGvLgPyX8VCA==}
+
+  '@photo-sphere-viewer/gyroscope-plugin@5.14.1':
+    resolution: {integrity: sha512-MPFi8cHKOReldsRIIMqQTWV+I7uHgfiPjy8iIIgx5R5lWBz4vL0EIUeevduxb6EiJVNmV7VAwiIZ9i9u3u0SFw==}
+    peerDependencies:
+      '@photo-sphere-viewer/core': 5.14.1
+
+  '@photo-sphere-viewer/parent@file:Photo-Sphere-Viewer-5.14.1.tar.gz':
+    resolution: {integrity: sha512-cZrebI96XvbL2/91/iRvjjWE1RS8eJON13s55W4NlXNhOCW1v02OBSoQ7EV4MVHMs4+qNog29bj15PBph30Vmg==, tarball: file:Photo-Sphere-Viewer-5.14.1.tar.gz}
+    version: 0.0.0
+    engines: {node: '>=20'}
 
   '@popperjs/core@2.11.8':
     resolution: {integrity: sha512-P1st0aksCrn9sGZhp8GMYwBnQsbvAWsZAX44oXNNvLHGqAOcoVxmjZiohstwQ7SqKnbR47akdNi+uleWD8+g6A==}
@@ -3770,6 +3792,9 @@ packages:
   three@0.147.0:
     resolution: {integrity: sha512-LPTOslYQXFkmvceQjFTNnVVli2LaVF6C99Pv34fJypp8NbQLbTlu3KinZ0zURghS5zEehK+VQyvWuPZ/Sm8fzw==}
 
+  three@0.179.1:
+    resolution: {integrity: sha512-5y/elSIQbrvKOISxpwXCR4sQqHtGiOI+MKLc3SsBdDXA2hz3Mdp3X59aUp8DyybMa34aeBwbFTpdoLJaUDEWSw==}
+
   throttleit@2.1.0:
     resolution: {integrity: sha512-nt6AMGKW1p/70DF/hGBdJB57B8Tspmbp5gfJ8ilhLnt7kkr2ye7hzD6NVG8GGErk2HWF34igrL2CXmNIkzKqKw==}
     engines: {node: '>=18'}
@@ -4685,6 +4710,16 @@ snapshots:
 
   '@oxc-transform/binding-win32-x64-msvc@0.111.0':
     optional: true
+
+  '@photo-sphere-viewer/core@5.14.1':
+    dependencies:
+      three: 0.179.1
+
+  '@photo-sphere-viewer/gyroscope-plugin@5.14.1(@photo-sphere-viewer/core@5.14.1)':
+    dependencies:
+      '@photo-sphere-viewer/core': 5.14.1
+
+  '@photo-sphere-viewer/parent@file:Photo-Sphere-Viewer-5.14.1.tar.gz': {}
 
   '@popperjs/core@2.11.8': {}
 
@@ -7473,6 +7508,8 @@ snapshots:
       - react-native-b4a
 
   three@0.147.0: {}
+
+  three@0.179.1: {}
 
   throttleit@2.1.0: {}
 

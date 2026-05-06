@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { X, Navigation, ImageOff, RefreshCw, ZoomIn, ZoomOut, RotateCw, Smartphone } from 'lucide-react';
-import { Viewer } from 'photo-sphere-viewer';
-import 'photo-sphere-viewer/dist/photo-sphere-viewer.css';
+import { Viewer } from '@photo-sphere-viewer/core';
+import { GyroscopePlugin } from '@photo-sphere-viewer/gyroscope-plugin';
+import '@photo-sphere-viewer/core/index.css';
 
 interface PanoramaViewerProps {
   panoramaUrl: string;
@@ -19,19 +20,8 @@ export function PanoramaViewer({ panoramaUrl, locationName, onClose }: PanoramaV
 
   // 检查设备是否支持陀螺仪
   useEffect(() => {
-    // 检测是否为移动设备
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    
-    if (!isMobile) {
-      setShowGyroButton(false);
-      console.log('Non-mobile device detected, hiding gyroscope button');
-    }
-    
-    // 检查陀螺仪支持
-    if (typeof DeviceOrientationEvent === 'undefined') {
-      console.log('DeviceOrientationEvent not supported');
-      setShowGyroButton(false);
-    }
+    // 强制显示陀螺仪按钮
+    setShowGyroButton(true);
   }, []);
 
   useEffect(() => {
@@ -57,28 +47,47 @@ export function PanoramaViewer({ panoramaUrl, locationName, onClose }: PanoramaV
       if (!containerRef.current) return;
 
       try {
+        const plugins: any[] = [];
+        
+        if (GyroscopePlugin) {
+          // 创建陀螺仪插件实例并配置选项
+          const gyroPlugin = new GyroscopePlugin({
+            touchmove: true,      // 允许水平移动
+            roll: true,           // 应用相机滚动
+            absolutePosition: false, // 使用相对位置
+            moveMode: 'smooth'   // 平滑移动
+          });
+          plugins.push(gyroPlugin);
+          console.log('✅ Gyroscope plugin configured and added');
+        } else {
+          console.warn('⚠️ Gyroscope plugin not available, continuing without it');
+        }
+
         const viewer = new Viewer({
           container: containerRef.current,
           panorama: panoramaUrl,
           caption: locationName,
-          defaultZoomLvl: 50, // 设置默认缩放级别
+          defaultZoomLvl: 50,
           mousewheel: true,
           navbar: [
             'zoom',
             'move',
             'fullscreen'
-          ]
+          ],
+          plugins: [
+            GyroscopePlugin,
+          ],
         });
 
         viewerRef.current = viewer;
 
-        viewer.on('ready', () => {
+        viewer.addEventListener('ready', () => {
           console.log('Panorama viewer ready');
           setLoading(false);
           setError(null);
         });
 
-        viewer.on('error', (e: any) => {
+        viewer.addEventListener('error', (e: any) => {
           console.error('Panorama viewer error:', e);
           setLoading(false);
           setError('Failed to initialize panorama viewer. The image format may not be supported.');
@@ -101,9 +110,15 @@ export function PanoramaViewer({ panoramaUrl, locationName, onClose }: PanoramaV
   const toggleGyroscope = async () => {
     if (!viewerRef.current) return;
 
+    const gyroPlugin = viewerRef.current.getPlugin(GyroscopePlugin);
+    if (!gyroPlugin) {
+      setError('Gyroscope plugin not available');
+      return;
+    }
+
     if (gyroEnabled) {
       try {
-        viewerRef.current.stopGyroscopeControl();
+        gyroPlugin.stop();
         setGyroEnabled(false);
       } catch (err) {
         console.error('Failed to disable gyroscope:', err);
@@ -117,7 +132,7 @@ export function PanoramaViewer({ panoramaUrl, locationName, onClose }: PanoramaV
             try {
               const permission = await (DeviceOrientationEvent as any).requestPermission();
               if (permission === 'granted') {
-                await viewerRef.current.startGyroscopeControl();
+                gyroPlugin.start();
                 setGyroEnabled(true);
               } else {
                 setError('Gyroscope permission denied. Please allow access in your device settings.');
@@ -128,7 +143,7 @@ export function PanoramaViewer({ panoramaUrl, locationName, onClose }: PanoramaV
             }
           } else {
             // Android和其他设备直接启用
-            await viewerRef.current.startGyroscopeControl();
+            gyroPlugin.start();
             setGyroEnabled(true);
           }
         } else {
@@ -255,7 +270,7 @@ export function PanoramaViewer({ panoramaUrl, locationName, onClose }: PanoramaV
         </div>
       )}
 
-      <div 
+      <div
         ref={containerRef}
         className="flex-1 w-full h-full"
       />
