@@ -27,6 +27,27 @@ const buttonPositions: Record<string, { x: number; y: number; size: number }> = 
   '12': { x: 580, y: 900, size: 20 },  // 环境科学大楼 (ES)
 };
 
+// 校园地图边界坐标（示例值，需要根据实际地图调整）
+// 苏州西交利物浦大学的大致坐标范围
+const CAMPUS_BOUNDS = {
+  north: 31.281614119049036,
+  south: 31.27534623859844,
+  east: 120.74501235711083,
+  west: 120.72424536239407
+};
+
+// 将经纬度坐标转换为地图上的像素坐标
+const convertToMapCoordinates = (lat: number, lng: number) => {
+  // 简单的线性映射，需要根据实际地图尺寸和坐标范围调整
+  const x = ((lng - CAMPUS_BOUNDS.west) / (CAMPUS_BOUNDS.east - CAMPUS_BOUNDS.west)) * 1000;
+  const y = ((CAMPUS_BOUNDS.north - lat) / (CAMPUS_BOUNDS.north - CAMPUS_BOUNDS.south)) * 1000;
+  
+  // 调试信息
+  console.log('Converting coordinates:', { lat, lng, x, y });
+  
+  return { x, y };
+};
+
 export function MapView({ locations, onLocationSelect, showRealTimeLocation = true }: MapViewProps) {// 地图组件
   const [scale, setScale] = useState(1);// 缩放比例
   const [position, setPosition] = useState({ x: 0, y: 0 });// 地图位置
@@ -34,6 +55,17 @@ export function MapView({ locations, onLocationSelect, showRealTimeLocation = tr
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });//拖拽开始位置
   const [showInfo, setShowInfo] = useState(true);// 是否显示信息
   const [userPosition, setUserPosition] = useState<{ latitude: number; longitude: number; accuracy: number } | null>(null);
+  const [debugMode, setDebugMode] = useState(false);// 调试模式开关
+  
+  // 调试：检查userPosition状态
+  useEffect(() => {
+    console.log('userPosition updated:', userPosition);
+  }, [userPosition]);
+  
+  // 调试：检查userPosition状态
+  useEffect(() => {
+    console.log('userPosition updated:', userPosition);
+  }, [userPosition]);
   
   // 使用ref来引用SVG容器
   const svgContainerRef = useRef<HTMLDivElement>(null);
@@ -75,6 +107,7 @@ export function MapView({ locations, onLocationSelect, showRealTimeLocation = tr
 
   // 处理位置更新
   const handleLocationUpdate = (position: { latitude: number; longitude: number; accuracy: number }) => {
+    console.log('Location update received:', position);
     setUserPosition(position);
   };
   
@@ -179,6 +212,75 @@ export function MapView({ locations, onLocationSelect, showRealTimeLocation = tr
               </g>
             );
           })}
+          
+          {/* 实时位置标记 - 集成到SVG系统中 */}
+          {userPosition && (
+            <g className="pointer-events-none">
+              {/* 精度范围圆环 - 修复精度计算 */}
+              <circle 
+                cx={convertToMapCoordinates(userPosition.latitude, userPosition.longitude).x}
+                cy={convertToMapCoordinates(userPosition.latitude, userPosition.longitude).y}
+                r={Math.max(userPosition.accuracy * 0.05, 5)} // 调整精度范围比例
+                fill="#ef4444"
+                fillOpacity="0.2"
+                stroke="#ef4444"
+                strokeWidth="1"
+                strokeOpacity="0.5"
+              />
+              
+              {/* 位置标记 - 红色圆点 */}
+              <circle 
+                cx={convertToMapCoordinates(userPosition.latitude, userPosition.longitude).x}
+                cy={convertToMapCoordinates(userPosition.latitude, userPosition.longitude).y}
+                r="8"
+                fill="#ef4444"
+                stroke="white"
+                strokeWidth="2"
+              />
+              
+              {/* 中心白点 */}
+              <circle 
+                cx={convertToMapCoordinates(userPosition.latitude, userPosition.longitude).x}
+                cy={convertToMapCoordinates(userPosition.latitude, userPosition.longitude).y}
+                r="2"
+                fill="white"
+              />
+            </g>
+          )}
+          
+          {/* 调试模式：显示边界框 */}
+          {debugMode && (
+            <g className="pointer-events-none">
+              {/* 边界矩形 */}
+              <rect
+                x="0"
+                y="0"
+                width="1000"
+                height="1000"
+                fill="none"
+                stroke="#fbbf24"
+                strokeWidth="2"
+                strokeDasharray="10,5"
+              />
+              
+              {/* 边界标签 */}
+              <text x="500" y="20" textAnchor="middle" fill="#fbbf24" fontSize="14" fontWeight="bold">
+                Debug Mode - Campus Bounds
+              </text>
+              <text x="10" y="35" fill="#fbbf24" fontSize="12">
+                NW: {CAMPUS_BOUNDS.north.toFixed(6)}, {CAMPUS_BOUNDS.west.toFixed(6)}
+              </text>
+              <text x="990" y="35" textAnchor="end" fill="#fbbf24" fontSize="12">
+                NE: {CAMPUS_BOUNDS.north.toFixed(6)}, {CAMPUS_BOUNDS.east.toFixed(6)}
+              </text>
+              <text x="10" y="985" fill="#fbbf24" fontSize="12">
+                SW: {CAMPUS_BOUNDS.south.toFixed(6)}, {CAMPUS_BOUNDS.west.toFixed(6)}
+              </text>
+              <text x="990" y="985" textAnchor="end" fill="#fbbf24" fontSize="12">
+                SE: {CAMPUS_BOUNDS.south.toFixed(6)}, {CAMPUS_BOUNDS.east.toFixed(6)}
+              </text>
+            </g>
+          )}
         </svg>
       </div>
 
@@ -214,7 +316,94 @@ export function MapView({ locations, onLocationSelect, showRealTimeLocation = tr
         <div className="bg-white/95 backdrop-blur-sm rounded-lg p-1 shadow-md text-center">
           <span className="text-[10px] font-bold text-blue-600">{Math.round(scale * 100)}%</span>
         </div>
+        <button
+          onClick={() => setDebugMode(!debugMode)}
+          className={`bg-white/95 backdrop-blur-sm rounded-lg p-2 shadow-md hover:bg-white transition-colors ${debugMode ? 'ring-2 ring-yellow-400' : ''}`}
+          title="Toggle Debug Mode"
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            {debugMode ? (
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            ) : (
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+            )}
+          </svg>
+        </button>
       </div>
+      
+      {/* 调试模式面板 */}
+      {debugMode && (
+        <div className="absolute bottom-4 right-4 z-20 bg-yellow-50 border-2 border-yellow-300 rounded-lg shadow-lg p-3 max-w-xs">
+          <div className="flex items-center justify-between mb-2">
+            <span className="font-bold text-yellow-800 text-sm">Debug Mode Active</span>
+            <button
+              onClick={() => setDebugMode(false)}
+              className="text-yellow-600 hover:text-yellow-800 text-xs"
+            >
+              Close
+            </button>
+          </div>
+          
+          <div className="space-y-2 text-xs">
+            <div className="border-b border-yellow-200 pb-2">
+              <span className="font-semibold text-yellow-700">Campus Bounds:</span>
+              <div className="grid grid-cols-2 gap-1 mt-1">
+                <div>
+                  <span className="text-gray-600">North:</span>
+                  <span className="ml-1 font-mono">{CAMPUS_BOUNDS.north.toFixed(6)}</span>
+                </div>
+                <div>
+                  <span className="text-gray-600">South:</span>
+                  <span className="ml-1 font-mono">{CAMPUS_BOUNDS.south.toFixed(6)}</span>
+                </div>
+                <div>
+                  <span className="text-gray-600">East:</span>
+                  <span className="ml-1 font-mono">{CAMPUS_BOUNDS.east.toFixed(6)}</span>
+                </div>
+                <div>
+                  <span className="text-gray-600">West:</span>
+                  <span className="ml-1 font-mono">{CAMPUS_BOUNDS.west.toFixed(6)}</span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="border-b border-yellow-200 pb-2">
+              <span className="font-semibold text-yellow-700">User Position:</span>
+              {userPosition ? (
+                <div className="mt-1 space-y-1">
+                  <div>
+                    <span className="text-gray-600">Lat:</span>
+                    <span className="ml-1 font-mono">{userPosition.latitude.toFixed(6)}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-600">Lng:</span>
+                    <span className="ml-1 font-mono">{userPosition.longitude.toFixed(6)}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-600">Map X:</span>
+                    <span className="ml-1 font-mono">{convertToMapCoordinates(userPosition.latitude, userPosition.longitude).x.toFixed(2)}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-600">Map Y:</span>
+                    <span className="ml-1 font-mono">{convertToMapCoordinates(userPosition.latitude, userPosition.longitude).y.toFixed(2)}</span>
+                  </div>
+                </div>
+              ) : (
+                <span className="text-gray-500">No position data</span>
+              )}
+            </div>
+            
+            <div>
+              <span className="font-semibold text-yellow-700">Instructions:</span>
+              <ul className="text-gray-600 list-disc list-inside mt-1 space-y-1">
+                <li>Adjust bounds in MapView.tsx</li>
+                <li>Map X/Y should be 0-1000</li>
+                <li>Red dot should appear on map</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="absolute bottom-4 left-4 z-20">
         <div className="bg-white/95 backdrop-blur-sm rounded-lg shadow-md overflow-hidden">

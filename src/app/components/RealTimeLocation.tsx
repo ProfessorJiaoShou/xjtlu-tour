@@ -13,21 +13,7 @@ interface Position {
   timestamp: number;
 }
 
-// 校园地图边界坐标（示例值，需要根据实际地图调整）
-const CAMPUS_BOUNDS = {
-  north: 31.285,
-  south: 31.275,
-  east: 120.745,
-  west: 120.735
-};
-
-// 将经纬度坐标转换为地图上的像素坐标
-const convertToMapCoordinates = (lat: number, lng: number) => {
-  // 简单的线性映射，需要根据实际地图尺寸和坐标范围调整
-  const x = ((lng - CAMPUS_BOUNDS.west) / (CAMPUS_BOUNDS.east - CAMPUS_BOUNDS.west)) * 1000;
-  const y = ((CAMPUS_BOUNDS.north - lat) / (CAMPUS_BOUNDS.north - CAMPUS_BOUNDS.south)) * 1000;
-  return { x, y };
-};
+// 坐标转换函数在MapView.tsx中定义
 
 export function RealTimeLocation({ onLocationUpdate, showAccuracy = true }: RealTimeLocationProps) {
   const [position, setPosition] = useState<Position | null>(null);
@@ -112,21 +98,21 @@ export function RealTimeLocation({ onLocationUpdate, showAccuracy = true }: Real
     return cleanupWatch;
   }, []);
 
-  // 计算地图上的位置
-  const mapPosition = position ? convertToMapCoordinates(position.latitude, position.longitude) : null;
+  // 计算地图上的位置（由MapView组件处理）
+  // 位置标记已集成到MapView的SVG系统中
 
   return (
-    <div className="absolute top-4 right-4 z-50 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg p-4 min-w-64">
-      <div className="flex items-center justify-between mb-3">
+    <div className="absolute top-4 right-4 z-50 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg p-3 min-w-48">
+      <div className="flex items-center justify-between mb-2">
         <h3 className="font-semibold text-gray-800 flex items-center gap-2">
-          <Crosshair className="w-4 h-4" />
-          Real-time Location
+          <Crosshair className="w-3 h-3" />
+          <span className="text-sm">Location</span>
         </h3>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           {isTracking ? (
             <div className="flex items-center gap-1 text-green-600">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              <span className="text-xs">Tracking</span>
+              <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
+              <span className="text-xs">Active</span>
             </div>
           ) : (
             <span className="text-xs text-gray-500">Inactive</span>
@@ -135,77 +121,50 @@ export function RealTimeLocation({ onLocationUpdate, showAccuracy = true }: Real
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-md p-2 mb-3">
-          <p className="text-red-700 text-sm">{error}</p>
+        <div className="bg-red-50 border border-red-200 rounded-md p-1.5 mb-2">
+          <p className="text-red-700 text-xs">{error}</p>
         </div>
       )}
 
       {position && (
-        <div className="space-y-2 text-sm text-gray-600">
+        <div className="space-y-1 text-xs text-gray-600">
           <div className="flex justify-between">
-            <span>Latitude:</span>
-            <span className="font-mono">{position.latitude.toFixed(6)}</span>
+            <span>Lat:</span>
+            <span className="font-mono">{position.latitude.toFixed(4)}</span>
           </div>
           <div className="flex justify-between">
-            <span>Longitude:</span>
-            <span className="font-mono">{position.longitude.toFixed(6)}</span>
+            <span>Lng:</span>
+            <span className="font-mono">{position.longitude.toFixed(4)}</span>
           </div>
           {showAccuracy && (
             <div className="flex justify-between">
-              <span>Accuracy:</span>
-              <span className="font-mono">±{accuracyRadius.toFixed(1)}m</span>
+              <span>Acc:</span>
+              <span className="font-mono">±{accuracyRadius.toFixed(0)}m</span>
             </div>
           )}
         </div>
       )}
 
-      <div className="flex gap-2 mt-3">
+      <div className="flex gap-1.5 mt-2">
         {!isTracking ? (
           <button
             onClick={startTracking}
-            className="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center justify-center gap-2"
+            className="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-2 py-1.5 rounded text-xs font-medium transition-colors flex items-center justify-center gap-1"
           >
-            <Navigation className="w-4 h-4" />
-            Start Tracking
+            <Navigation className="w-3 h-3" />
+            Start
           </button>
         ) : (
           <button
             onClick={stopTracking}
-            className="flex-1 bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
+            className="flex-1 bg-red-500 hover:bg-red-600 text-white px-2 py-1.5 rounded text-xs font-medium transition-colors"
           >
-            Stop Tracking
+            Stop
           </button>
         )}
       </div>
 
-      {/* 在地图上显示位置标记 */}
-      {mapPosition && (
-        <div
-          className="absolute z-50 pointer-events-none"
-          style={{
-            left: `${mapPosition.x}px`,
-            top: `${mapPosition.y}px`,
-            transform: 'translate(-50%, -50%)'
-          }}
-        >
-          <div className="relative">
-            {/* 精度范围圆环 */}
-            {showAccuracy && accuracyRadius > 0 && (
-              <div
-                className="absolute border-2 border-blue-300/50 rounded-full bg-blue-100/20"
-                style={{
-                  width: `${Math.max(accuracyRadius * 0.5, 20)}px`,
-                  height: `${Math.max(accuracyRadius * 0.5, 20)}px`,
-                  transform: 'translate(-50%, -50%)'
-                }}
-              />
-            )}
-            
-            {/* 位置标记 - 红色圆点 */}
-            <div className="w-4 h-4 bg-red-500 rounded-full border-2 border-white shadow-lg" />
-          </div>
-        </div>
-      )}
+      {/* 位置标记已集成到MapView组件的SVG系统中 */}
     </div>
   );
 }
