@@ -4,7 +4,7 @@ interface TourProgressProps {
   visitedCount: number;
   totalCount: number;
   points: number;
-  mapMode?: 'custom' | 'amap';
+  mapMode?: 'custom' | 'osm';
   onToggleMapMode?: () => void;
   onOpenPhotoAlbum?: () => void;
   hasUserPhotos?: boolean;
@@ -34,7 +34,7 @@ export function TourProgress({ visitedCount, totalCount, points, mapMode = 'cust
           >
             <MapPin className="w-4 h-4" />
             <span className="text-sm font-medium">
-              {mapMode === 'custom' ? 'Custom Map' : 'AMap'}
+              {mapMode === 'custom' ? 'Custom Map' : 'OSM'}
             </span>
           </button>
           {hasUserPhotos && onOpenPhotoAlbum && (

@@ -4,7 +4,7 @@ import { WelcomeScreen } from './components/WelcomeScreen';
 import { LocationDetail } from './components/LocationDetail';
 import { TourProgress } from './components/TourProgress';
 import { PanoramaViewer } from './components/PanoramaViewer';
-import { AMapView } from './components/AMapView';
+import { OSMapView } from './components/OSMapView';
 import { CameraCapture } from './components/CameraCapture';
 import { PhotoAlbum } from './components/PhotoAlbum';
 import { CheckInSuccess } from './components/CheckInSuccess';
@@ -44,7 +44,7 @@ export default function App() {
   const [showPhotoAlbum, setShowPhotoAlbum] = useState(false);
   const [showCompletionAlbum, setShowCompletionAlbum] = useState(false);
   const [totalPoints, setTotalPoints] = useState(0);
-  const [mapMode, setMapMode] = useState<'custom' | 'amap'>('custom'); // Map mode: custom - custom map, amap - Amap
+  const [mapMode, setMapMode] = useState<'custom' | 'osm'>('custom'); // Map mode: custom - custom map, osm - OpenStreetMap
 
   const toggleMapMode = () => {
     setMapMode(prev => prev === 'custom' ? 'amap' : 'custom');
@@ -321,7 +321,7 @@ export default function App() {
             onLocationSelect={handleLocationSelect}
           />
         ) : (
-          <AMapView
+          <OSMapView
             locations={locations}
             onLocationSelect={handleLocationSelect}
           />
