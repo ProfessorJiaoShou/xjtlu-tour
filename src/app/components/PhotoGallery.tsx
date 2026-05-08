@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { X, ChevronLeft, ChevronRight, ZoomIn, ZoomOut } from 'lucide-react';
 import { Button } from './ui/button';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from './ui/carousel';
@@ -13,6 +13,8 @@ interface PhotoGalleryProps {
 export function PhotoGallery({ locationName, photos, onClose }: PhotoGalleryProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isZoomed, setIsZoomed] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const clickTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleNext = () => {
     setCurrentIndex((prev) => (prev + 1) % photos.length);
@@ -20,6 +22,30 @@ export function PhotoGallery({ locationName, photos, onClose }: PhotoGalleryProp
 
   const handlePrevious = () => {
     setCurrentIndex((prev) => (prev - 1 + photos.length) % photos.length);
+  };
+
+  const handleImageClick = async () => {
+    if (clickTimeoutRef.current) {
+      clearTimeout(clickTimeoutRef.current);
+      clickTimeoutRef.current = null;
+      
+      if (containerRef.current) {
+        try {
+          if (!document.fullscreenElement) {
+            await containerRef.current.requestFullscreen();
+          } else {
+            await document.exitFullscreen();
+          }
+        } catch (error) {
+          console.error('Fullscreen error:', error);
+        }
+      }
+    } else {
+      clickTimeoutRef.current = setTimeout(() => {
+        setIsZoomed(!isZoomed);
+        clickTimeoutRef.current = null;
+      }, 300);
+    }
   };
 
   const handleZoom = () => {
@@ -40,7 +66,7 @@ export function PhotoGallery({ locationName, photos, onClose }: PhotoGalleryProp
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-black flex flex-col">
+    <div ref={containerRef} className="fixed inset-0 z-50 bg-black flex flex-col">
       <div className="absolute top-4 left-4 right-4 z-10 flex items-center justify-between">
         <div className="bg-black/50 backdrop-blur-sm rounded-lg px-4 py-2 text-white">
           <div className="flex items-center gap-2">
@@ -90,19 +116,22 @@ export function PhotoGallery({ locationName, photos, onClose }: PhotoGalleryProp
             {photos.map((photo, index) => (
               <CarouselItem key={index} className="h-full flex items-center justify-center">
                 <div
-                  className={`
-                    relative w-full h-full flex items-center justify-center
-                    ${isZoomed ? 'cursor-zoom-out' : 'cursor-zoom-in'}
-                  `}
-                  onClick={handleZoom}
+                  className="
+                    relative w-full h-full flex items-center justify-center cursor-pointer
+                  "
+                  onClick={handleImageClick}
                 >
                   <img
                     src={photo}
                     alt={`${locationName} - Photo ${index + 1}`}
                     className={`
-                      object-contain transition-transform duration-300
-                      ${isZoomed ? 'scale-150' : 'scale-100'}
+                      max-w-full max-h-full object-contain transition-transform duration-300
+                      ${isZoomed ? 'scale-200' : 'scale-100'}
                     `}
+                    style={{
+                      maxWidth: '100vw',
+                      maxHeight: '100vh',
+                    }}
                   />
                 </div>
               </CarouselItem>
@@ -115,7 +144,7 @@ export function PhotoGallery({ locationName, photos, onClose }: PhotoGalleryProp
 
       <div className="absolute bottom-4 left-4 right-4 z-10">
         <div className="bg-black/50 backdrop-blur-sm rounded-lg px-4 py-2 text-white text-center text-sm">
-          <p>Swipe or use arrows to navigate · Click image to zoom</p>
+          <p>Swipe or use arrows · Click to zoom · Double-click to fullscreen</p>
         </div>
       </div>
     </div>

@@ -14,10 +14,45 @@ import pano3 from '../imports/panoramas/3.JPG';
 import pano6 from '../imports/panoramas/6.JPG';
 import pano11 from '../imports/panoramas/11.JPG';
 
+// Import 2D photos
 import cb from '../imports/photos/cb.JPG';
-
-
-
+import as1 from '../imports/photos/as1.jpg';
+import as2 from '../imports/photos/as2.jpg';
+import as3 from '../imports/photos/as3.jpg';
+import sa1 from '../imports/photos/sa1.jpg';
+import sa2 from '../imports/photos/sa2.jpg';
+import sa3 from '../imports/photos/sa3.jpg';
+import sa4 from '../imports/photos/sa4.jpg';
+import sa5 from '../imports/photos/sa5.jpg';
+import sa6 from '../imports/photos/sa6.jpg';
+import eb1 from '../imports/photos/eb1.jpg';
+import eb2 from '../imports/photos/eb2.jpg';
+import eb3 from '../imports/photos/eb3.jpg';
+import eb4 from '../imports/photos/eb4.jpg';
+import eb5 from '../imports/photos/eb5.jpg';
+import ee1 from '../imports/photos/ee1.jpg';
+import ee2 from '../imports/photos/ee2.jpg';
+import ee3 from '../imports/photos/ee3.jpg';
+import ee4 from '../imports/photos/ee4.jpg';
+import sport1 from '../imports/photos/sport1.jpg';
+import sport2 from '../imports/photos/sport2.jpg';
+import sport3 from '../imports/photos/sport3.jpg';
+import sport4 from '../imports/photos/sport4.jpg';
+import sport5 from '../imports/photos/sport5.jpg';
+import sport6 from '../imports/photos/sport6.jpg';
+import southlake1 from '../imports/photos/southlake1.jpg';
+import southlake2 from '../imports/photos/southlake2.jpg';
+import southlake3 from '../imports/photos/southlake3.jpg';
+import bs1 from '../imports/photos/bs1.jpg';
+import bs2 from '../imports/photos/bs2.jpg';
+import bs3 from '../imports/photos/bs3.jpg';
+import ma1 from '../imports/photos/ma1.jpg';
+import ma2 from '../imports/photos/ma2.jpg';
+import ma3 from '../imports/photos/ma3.jpg';
+import ma4 from '../imports/photos/ma4.jpg';
+import es1 from '../imports/photos/es1.jpg';
+import es2 from '../imports/photos/es2.jpg';
+import es3 from '../imports/photos/es3.jpg';
 
 export type Location = {
   id: string;
@@ -62,7 +97,6 @@ export default function App() {
       points: 10,
       photos: [cb],
       visible: true,
-      floorPlanUrl: [cb]
     },
     //下面这个已经弃用
     {
@@ -75,11 +109,7 @@ export default function App() {
       coordinates: { x: 30, y: 35 },
       visited: false,
       points: 15,
-      photos: [
-        'https://images.unsplash.com/photo-1568667256549-094345857637?w=800',
-        'https://images.unsplash.com/photo-1521587760476-6c12a4b040da?w=800',
-        'https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=800'
-      ],
+      photos: [as1, as2, as3],
       visible: true
     },
     {
@@ -104,6 +134,7 @@ export default function App() {
       coordinates: { x: 75, y: 75 },
       visited: false,
       points: 10,
+      photos: [sport1, sport2, sport3, sport4, sport5, sport6],
       visible: true
     },
     {
@@ -116,6 +147,7 @@ export default function App() {
       coordinates: { x: 50, y: 75 },
       visited: false,
       points: 5,
+      photos: [southlake1, southlake2, southlake3],
       visible: true
     },
     {
@@ -128,6 +160,7 @@ export default function App() {
       coordinates: { x: 52, y: 48 },
       visited: false,
       points: 5,
+      photos: [],
       visible: true
     },
     {
@@ -140,6 +173,7 @@ export default function App() {
       coordinates: { x: 58, y: 52 },
       visited: false,
       points: 15,
+      photos: [eb1, eb2, eb3, eb4, eb5],
       visible: true
     },
     {
@@ -152,6 +186,7 @@ export default function App() {
       coordinates: { x: 62, y: 58 },
       visited: false,
       points: 10,
+      photos: [bs1, bs2, bs3],
       visible: true
     },
     {//这个也弃用
@@ -164,6 +199,7 @@ export default function App() {
       coordinates: { x: 46, y: 38 },
       visited: false,
       points: 10,
+      photos: [sa1, sa2, sa3, sa4, sa5, sa6],
       visible: true
     },
     {
@@ -176,6 +212,7 @@ export default function App() {
       coordinates: { x: 22, y: 28 },
       visited: false,
       points: 15,
+      photos: [],
       visible: true
     },
     {
@@ -188,6 +225,7 @@ export default function App() {
       coordinates: { x: 56, y: 62 },
       visited: false,
       points: 10,
+      photos: [ma1, ma2, ma3, ma4],
       visible: true
     },
     {
@@ -200,6 +238,7 @@ export default function App() {
       coordinates: { x: 68, y: 38 },
       visited: false,
       points: 10,
+      photos: [es1, es2, es3],
       visible: true
     }
   ]);
