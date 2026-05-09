@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { MapView } from './components/MapView';
 import { WelcomeScreen } from './components/WelcomeScreen';
+import { ProfileSetup } from './components/ProfileSetup';
+import { QRCodeExchange } from './components/QRCodeExchange';
 import { LocationDetail } from './components/LocationDetail';
 import { TourProgress } from './components/TourProgress';
 import { PanoramaViewer } from './components/PanoramaViewer';
@@ -72,6 +74,8 @@ export type Location = {
 
 export default function App() {
   const [showWelcome, setShowWelcome] = useState(true);
+  const [showProfileSetup, setShowProfileSetup] = useState(false);
+  const [showQRExchange, setShowQRExchange] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
   const [panoramaLocation, setPanoramaLocation] = useState<Location | null>(null);
   const [checkInSuccessLocation, setCheckInSuccessLocation] = useState<Location | null>(null);
@@ -80,10 +84,33 @@ export default function App() {
   const [showCompletionAlbum, setShowCompletionAlbum] = useState(false);
   const [totalPoints, setTotalPoints] = useState(0);
   const [mapMode, setMapMode] = useState<'custom' | 'osm'>('custom'); // Map mode: custom - custom map, osm - OpenStreetMap
+  const [userProfile, setUserProfile] = useState<any>(null);
 
   const toggleMapMode = () => {
     setMapMode(prev => prev === 'custom' ? 'amap' : 'custom');
   };
+
+  const handleProfileSetupComplete = (profile: any) => {
+    setUserProfile(profile);
+    setShowProfileSetup(false);
+  };
+
+  const handleStartExploring = () => {
+    setShowWelcome(false);
+    const savedProfile = localStorage.getItem('userProfile');
+    if (!savedProfile) {
+      setShowProfileSetup(true);
+    } else {
+      setUserProfile(JSON.parse(savedProfile));
+    }
+  };
+
+  useEffect(() => {
+    const savedProfile = localStorage.getItem('userProfile');
+    if (savedProfile) {
+      setUserProfile(JSON.parse(savedProfile));
+    }
+  }, []);
   const [locations, setLocations] = useState<Location[]>([
     {
       id: '1',
@@ -338,7 +365,11 @@ export default function App() {
   const totalLocations = locations.length;
 
   if (showWelcome) {
-    return <WelcomeScreen onStart={() => setShowWelcome(false)} />;
+    return <WelcomeScreen onStart={handleStartExploring} />;
+  }
+
+  if (showProfileSetup) {
+    return <ProfileSetup onComplete={handleProfileSetupComplete} />;
   }
 
   return (
@@ -351,6 +382,7 @@ export default function App() {
         onToggleMapMode={toggleMapMode}
         onOpenPhotoAlbum={handleOpenPhotoAlbum}
         hasUserPhotos={locations.some(loc => loc.userPhoto)}
+        onOpenQRExchange={() => setShowQRExchange(true)}
       />
 
       <div className="flex-1 overflow-hidden">
@@ -415,6 +447,11 @@ export default function App() {
           isCompletion={true}
         />
       )}
+
+      <QRCodeExchange
+        isOpen={showQRExchange}
+        onClose={() => setShowQRExchange(false)}
+      />
     </div>
   );
 }

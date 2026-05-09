@@ -1,4 +1,4 @@
-import { Trophy, MapPin, Camera } from 'lucide-react';
+import { Trophy, MapPin, Camera, QrCode } from 'lucide-react';
 
 interface TourProgressProps {
   visitedCount: number;
@@ -8,9 +8,10 @@ interface TourProgressProps {
   onToggleMapMode?: () => void;
   onOpenPhotoAlbum?: () => void;
   hasUserPhotos?: boolean;
+  onOpenQRExchange?: () => void;
 }
 
-export function TourProgress({ visitedCount, totalCount, points, mapMode = 'custom', onToggleMapMode, onOpenPhotoAlbum, hasUserPhotos }: TourProgressProps) {
+export function TourProgress({ visitedCount, totalCount, points, mapMode = 'custom', onToggleMapMode, onOpenPhotoAlbum, hasUserPhotos, onOpenQRExchange }: TourProgressProps) {
   const percentage = (visitedCount / totalCount) * 100;
 
   return (
@@ -44,6 +45,15 @@ export function TourProgress({ visitedCount, totalCount, points, mapMode = 'cust
             >
               <Camera className="w-4 h-4" />
               <span className="text-sm font-medium">My Photos</span>
+            </button>
+          )}
+          {onOpenQRExchange && (
+            <button
+              onClick={onOpenQRExchange}
+              className="flex items-center gap-2 px-3 py-1 rounded-lg bg-gradient-to-r from-purple-500 to-indigo-500 text-white hover:from-purple-600 hover:to-indigo-600 transition-all duration-200"
+            >
+              <QrCode className="w-4 h-4" />
+              <span className="text-sm font-medium">QR Code</span>
             </button>
           )}
           <div className="flex items-center gap-2 bg-gradient-to-r from-yellow-400 to-orange-400 px-3 py-1 rounded-full">

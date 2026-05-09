@@ -9,7 +9,6 @@
     "vercel-build": "vite build"
   },
   "dependencies": {
-    "leaflet": "^1.9.4",
     "@emotion/react": "11.14.0",
     "@emotion/styled": "11.14.1",
     "@mui/icons-material": "7.3.5",
@@ -50,6 +49,7 @@
     "cmdk": "1.1.1",
     "date-fns": "3.6.0",
     "embla-carousel-react": "8.6.0",
+    "html5-qrcode": "^2.3.8",
     "input-otp": "1.4.2",
     "leaflet": "^1.9.4",
     "lucide-react": "0.487.0",
