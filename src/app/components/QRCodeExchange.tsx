@@ -1,6 +1,6 @@
 
 import { useState, useEffect, useRef } from 'react';
-import { QrCode, Copy, Check, User as UserIcon, Camera, AlertCircle, Scan } from 'lucide-react';
+import { QrCode, User as UserIcon, Camera, AlertCircle, Scan } from 'lucide-react';
 import { Button } from './ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from './ui/dialog';
 import { BusinessCard, UserProfile } from './BusinessCard';
@@ -13,13 +13,11 @@ interface QRCodeExchangeProps {
 }
 
 export function QRCodeExchange({ isOpen, onClose }: QRCodeExchangeProps) {
-  const [viewMode, setViewMode] = useState<'qr' | 'text' | 'scan'>('qr');
-  const [copied, setCopied] = useState(false);
+  const [viewMode, setViewMode] = useState<'qr' | 'scan'>('qr');
   const [scannedProfile, setScannedProfile] = useState<UserProfile | null>(null);
   const [scanError, setScanError] = useState('');
   const [isScanning, setIsScanning] = useState(false);
   const [inputCode, setInputCode] = useState('');
-  const [showInput, setShowInput] = useState(false);
   
   const scannerRef = useRef<Html5Qrcode | null>(null);
   const scannerContainerId = 'qr-reader-container';
@@ -30,20 +28,6 @@ export function QRCodeExchange({ isOpen, onClose }: QRCodeExchangeProps) {
     const qrData = JSON.stringify(userProfile);
     const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(qrData)}`;
     return qrUrl;
-  };
-
-  const generateTextCode = () => {
-    return JSON.stringify(userProfile);
-  };
-
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(generateTextCode());
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch (error) {
-      console.error('Failed to copy:', error);
-    }
   };
 
   const startScanner = async () => {
@@ -112,7 +96,6 @@ export function QRCodeExchange({ isOpen, onClose }: QRCodeExchangeProps) {
       setViewMode('qr');
       setScannedProfile(null);
       setScanError('');
-      setShowInput(false);
       setInputCode('');
     }
   }, [isOpen]);
@@ -145,9 +128,17 @@ export function QRCodeExchange({ isOpen, onClose }: QRCodeExchangeProps) {
   const resetScan = () => {
     setScannedProfile(null);
     setScanError('');
+    setInputCode('');
     if (viewMode === 'scan') {
       setTimeout(() => startScanner(), 100);
     }
+  };
+
+  const handleViewModeChange = (mode: 'qr' | 'scan') => {
+    setScannedProfile(null);
+    setScanError('');
+    setInputCode('');
+    setViewMode(mode);
   };
 
   return (
@@ -164,24 +155,17 @@ export function QRCodeExchange({ isOpen, onClose }: QRCodeExchangeProps) {
         </DialogHeader>
 
         <div className="space-y-6">
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-2 gap-2">
             <Button
               variant={viewMode === 'qr' ? 'default' : 'outline'}
-              onClick={() => setViewMode('qr')}
+              onClick={() => handleViewModeChange('qr')}
             >
               <QrCode className="w-4 h-4 mr-2" />
               My QR
             </Button>
             <Button
-              variant={viewMode === 'text' ? 'default' : 'outline'}
-              onClick={() => setViewMode('text')}
-            >
-              <UserIcon className="w-4 h-4 mr-2" />
-              Text
-            </Button>
-            <Button
               variant={viewMode === 'scan' ? 'default' : 'outline'}
-              onClick={() => setViewMode('scan')}
+              onClick={() => handleViewModeChange('scan')}
             >
               <Scan className="w-4 h-4 mr-2" />
               Scan
@@ -200,37 +184,6 @@ export function QRCodeExchange({ isOpen, onClose }: QRCodeExchangeProps) {
               <p className="text-center text-sm text-muted-foreground">
                 Let others scan this QR code to get your contact information
               </p>
-              <BusinessCard profile={userProfile} />
-            </div>
-          )}
-
-          {viewMode === 'text' && !scannedProfile && (
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Your Profile Code</label>
-                <div className="relative">
-                  <Input
-                    value={generateTextCode()}
-                    readOnly
-                    className="pr-12 font-mono text-xs"
-                  />
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="absolute right-2 top-1/2 -translate-y-1/2"
-                    onClick={handleCopy}
-                  >
-                    {copied ? (
-                      <Check className="w-4 h-4 text-green-600" />
-                    ) : (
-                      <Copy className="w-4 h-4" />
-                    )}
-                  </Button>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Share this code with others so they can add you to their contacts
-                </p>
-              </div>
               <BusinessCard profile={userProfile} />
             </div>
           )}
