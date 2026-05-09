@@ -11,15 +11,19 @@ interface LocationDetailProps {
   onViewPanorama?: (location: Location) => void;
   onViewPhotos?: (location: Location) => void;
   floorPlanUrl?: string;
+  navigation?: string[];
 }
 
-export function LocationDetail({ location, onClose, onVisit, onViewPanorama, floorPlanUrl }: LocationDetailProps) {
+export function LocationDetail({ location, onClose, onVisit, onViewPanorama, floorPlanUrl, navigation }: LocationDetailProps) {
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
   const [showPhotos, setShowPhotos] = useState(false);
   const [showFloorPlan, setShowFloorPlan] = useState(false);
+  const [showNavigation, setShowNavigation] = useState(false);
+  const [currentNavIndex, setCurrentNavIndex] = useState(0);
   const [floorPlanScale, setFloorPlanScale] = useState(1);
   const [isClosing, setIsClosing] = useState(false);
   const photos = location.photos || [];
+  const navImages = navigation || [];
 
   const handleClose = () => {
     setIsClosing(true);
@@ -242,6 +246,16 @@ export function LocationDetail({ location, onClose, onVisit, onViewPanorama, flo
               View Floor Plan
             </button>
           )}
+
+          {navImages.length > 0 && (
+            <button
+              onClick={() => setShowNavigation(true)}
+              className="w-full bg-gradient-to-r from-orange-600 to-red-600 text-white py-3 rounded-lg hover:shadow-lg transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-2"
+            >
+              <Navigation className="w-5 h-5" />
+              View Navigation Guide
+            </button>
+          )}
         </div>
       </div>
 
@@ -293,6 +307,49 @@ export function LocationDetail({ location, onClose, onVisit, onViewPanorama, flo
                   alt={`${location.name} Floor Plan`}
                   className="object-contain transition-transform duration-200"
                   style={{ transform: `scale(${floorPlanScale})` }}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showNavigation && navImages.length > 0 && (
+        <div 
+          className="fixed inset-0 z-[60] bg-black/90 flex items-center justify-center"
+          onClick={() => setShowNavigation(false)}
+        >
+          <div className="relative max-w-4xl w-full h-full p-4" onClick={(e) => e.stopPropagation()}>
+            <button
+              onClick={() => setShowNavigation(false)}
+              className="absolute top-6 right-6 z-10 bg-black/50 backdrop-blur-sm rounded-full p-3 text-white hover:bg-black/70 transition-colors"
+            >
+              <X className="w-6 h-6" />
+            </button>
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 bg-black/50 backdrop-blur-sm rounded-lg px-4 py-2 flex items-center gap-4">
+              <button
+                onClick={() => setCurrentNavIndex(prev => (prev - 1 + navImages.length) % navImages.length)}
+                className="hover:bg-white/20 rounded-full p-2 transition-colors text-white"
+                disabled={currentNavIndex === 0}
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+              <span className="text-white text-sm min-w-[4rem] text-center">{currentNavIndex + 1} / {navImages.length}</span>
+              <button
+                onClick={() => setCurrentNavIndex(prev => (prev + 1) % navImages.length)}
+                className="hover:bg-white/20 rounded-full p-2 transition-colors text-white"
+                disabled={currentNavIndex === navImages.length - 1}
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="h-full flex flex-col items-center justify-center">
+              <h3 className="text-white text-xl font-semibold mb-4">{location.name} - Navigation Guide</h3>
+              <div className="flex-1 w-full bg-white rounded-lg overflow-hidden flex items-center justify-center">
+                <img 
+                  src={navImages[currentNavIndex]} 
+                  alt={`${location.name} Navigation ${currentNavIndex + 1}`}
+                  className="object-contain max-w-full max-h-full"
                 />
               </div>
             </div>

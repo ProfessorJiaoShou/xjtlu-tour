@@ -56,6 +56,18 @@ import es1 from '../imports/photos/es1.jpg';
 import es2 from '../imports/photos/es2.jpg';
 import es3 from '../imports/photos/es3.jpg';
 
+// Import navigation images
+import nav1 from '../imports/navigation/01.png';
+import nav2 from '../imports/navigation/02.png';
+import nav3 from '../imports/navigation/03.png';
+import nav4 from '../imports/navigation/04.png';
+import nav5 from '../imports/navigation/05.png';
+import nav6 from '../imports/navigation/06.png';
+import nav7 from '../imports/navigation/07.png';
+import nav8 from '../imports/navigation/08.png';
+
+import nav10 from '../imports/navigation/10.png';
+
 export type Location = {
   id: string;
   name: string;
@@ -70,6 +82,7 @@ export type Location = {
   userPhoto?: string;
   visible?: boolean;
   floorPlanUrl?: string;
+  navigation?: string[];
 };
 
 export default function App() {
@@ -227,6 +240,7 @@ export default function App() {
       visited: false,
       points: 10,
       photos: [sa1, sa2, sa3, sa4, sa5, sa6],
+      navigation: [nav1, nav2, nav3, nav4, nav5, nav6, nav7, nav8, nav10],
       visible: true
     },
     {
@@ -406,6 +420,7 @@ export default function App() {
           onVisit={handleLocationVisit}
           onViewPanorama={handleViewPanorama}
           floorPlanUrl={selectedLocation.floorPlanUrl}
+          navigation={selectedLocation.navigation}
         />
       )}
 
