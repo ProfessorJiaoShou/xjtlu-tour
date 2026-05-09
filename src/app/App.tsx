@@ -10,6 +10,7 @@ import { OSMapView } from './components/OSMapView';
 import { CameraCapture } from './components/CameraCapture';
 import { PhotoAlbum } from './components/PhotoAlbum';
 import { CheckInSuccess } from './components/CheckInSuccess';
+import { Tutorial } from './components/Tutorial';
 
 import pano1 from '../imports/panoramas/1.JPG';
 import pano3 from '../imports/panoramas/3.JPG';
@@ -87,6 +88,7 @@ export type Location = {
 
 export default function App() {
   const [showWelcome, setShowWelcome] = useState(true);
+  const [showTutorial, setShowTutorial] = useState(false);
   const [showProfileSetup, setShowProfileSetup] = useState(false);
   const [showQRExchange, setShowQRExchange] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
@@ -116,6 +118,7 @@ export default function App() {
     } else {
       setUserProfile(JSON.parse(savedProfile));
     }
+    setShowTutorial(true);
   };
 
   useEffect(() => {
@@ -397,6 +400,7 @@ export default function App() {
         onOpenPhotoAlbum={handleOpenPhotoAlbum}
         hasUserPhotos={locations.some(loc => loc.userPhoto)}
         onOpenQRExchange={() => setShowQRExchange(true)}
+        onOpenTutorial={() => setShowTutorial(true)}
       />
 
       <div className="flex-1 overflow-hidden">
@@ -461,6 +465,10 @@ export default function App() {
           onClose={handleCloseCompletionAlbum}
           isCompletion={true}
         />
+      )}
+
+      {showTutorial && (
+        <Tutorial onClose={() => setShowTutorial(false)} />
       )}
 
       <QRCodeExchange

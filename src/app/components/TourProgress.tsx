@@ -1,4 +1,4 @@
-import { Trophy, MapPin, Camera, QrCode } from 'lucide-react';
+import { Trophy, MapPin, Camera, QrCode, HelpCircle } from 'lucide-react';
 
 interface TourProgressProps {
   visitedCount: number;
@@ -9,9 +9,10 @@ interface TourProgressProps {
   onOpenPhotoAlbum?: () => void;
   hasUserPhotos?: boolean;
   onOpenQRExchange?: () => void;
+  onOpenTutorial?: () => void;
 }
 
-export function TourProgress({ visitedCount, totalCount, points, mapMode = 'custom', onToggleMapMode, onOpenPhotoAlbum, hasUserPhotos, onOpenQRExchange }: TourProgressProps) {
+export function TourProgress({ visitedCount, totalCount, points, mapMode = 'custom', onToggleMapMode, onOpenPhotoAlbum, hasUserPhotos, onOpenQRExchange, onOpenTutorial }: TourProgressProps) {
   const percentage = (visitedCount / totalCount) * 100;
 
   return (
@@ -25,6 +26,15 @@ export function TourProgress({ visitedCount, totalCount, points, mapMode = 'cust
           </span>
         </div>
         <div className="flex items-center gap-4">
+          {onOpenTutorial && (
+            <button
+              onClick={onOpenTutorial}
+              className="flex items-center gap-2 px-3 py-1 rounded-lg bg-gradient-to-r from-teal-500 to-cyan-500 text-white hover:from-teal-600 hover:to-cyan-600 transition-all duration-200"
+            >
+              <HelpCircle className="w-4 h-4" />
+              <span className="text-sm font-medium">Tutorial</span>
+            </button>
+          )}
           <button
             onClick={onToggleMapMode}
             className={`flex items-center gap-2 px-3 py-1 rounded-lg transition-all duration-200 ${
