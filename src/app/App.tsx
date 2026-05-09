@@ -13,9 +13,17 @@ import { CheckInSuccess } from './components/CheckInSuccess';
 import { Tutorial } from './components/Tutorial';
 
 import pano1 from '../imports/panoramas/1.JPG';
+import pano2 from '../imports/panoramas/2.JPG';
 import pano3 from '../imports/panoramas/3.JPG';
+import pano4 from '../imports/panoramas/4.JPG';
+import pano5 from '../imports/panoramas/5.JPG';
 import pano6 from '../imports/panoramas/6.JPG';
+import pano7 from '../imports/panoramas/7.JPG';
+import pano8 from '../imports/panoramas/8.JPG';
+import pano9 from '../imports/panoramas/9.JPG';
+import pano10 from '../imports/panoramas/10.JPG';
 import pano11 from '../imports/panoramas/11.JPG';
+import pano12 from '../imports/panoramas/12.JPG';
 
 // Import 2D photos
 import cb from '../imports/photos/cb.JPG';
@@ -371,9 +379,17 @@ export default function App() {
   const getPanoramaUrl = (locationId: string) => {
     const panoramaMap: Record<string, string> = {
       '1': pano1,
+      '2': pano2,
       '3':pano3,
+      '4':pano4,
+      '5':pano5,
       '6':pano6,
+      '7':pano7,
+      '8':pano8,
+      '9':pano9,
+      '10':pano10,
       '11':pano11,
+      '12':pano12
     };
     return panoramaMap[locationId] || '';
   };
