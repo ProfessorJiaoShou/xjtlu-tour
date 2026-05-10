@@ -17,7 +17,7 @@ export function TourProgress({ visitedCount, totalCount, points, mapMode = 'cust
 
   return (
     <div className="bg-white border-b border-gray-200 shadow-sm p-4">
-      <div className="flex items-center justify-between mb-2">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-2">
         <div className="flex items-center gap-2">
           <MapPin className="w-5 h-5 text-blue-600" />
           <span className="text-sm">
@@ -25,7 +25,7 @@ export function TourProgress({ visitedCount, totalCount, points, mapMode = 'cust
             <span className="text-gray-500">/{totalCount}</span> visited
           </span>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-4">
           {onOpenTutorial && (
             <button
               onClick={onOpenTutorial}
